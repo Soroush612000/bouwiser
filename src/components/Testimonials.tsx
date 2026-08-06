@@ -9,8 +9,7 @@ import {
     Sparkles,
     Star,
     TrendingUp,
-    Zap,
-  } from "lucide-react";
+    } from "lucide-react";
   import { motion } from "framer-motion";
   
   const testimonials = [
