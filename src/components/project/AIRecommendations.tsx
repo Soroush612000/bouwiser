@@ -1,0 +1,192 @@
+import {
+  ArrowRight,
+  BadgeEuro,
+  Clock3,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
+
+import type {
+  ProjectData,
+  ProjectRecommendation,
+} from "../../data/project";
+
+interface AIRecommendationsProps {
+  project: ProjectData;
+}
+
+function getPriorityStyle(
+  priority: ProjectRecommendation["priority"],
+) {
+  if (priority === "High") {
+    return "bg-red-100 text-red-700";
+  }
+
+  if (priority === "Medium") {
+    return "bg-amber-100 text-amber-700";
+  }
+
+  return "bg-slate-100 text-slate-700";
+}
+
+function getStatusStyle(
+  status: ProjectRecommendation["status"],
+) {
+  if (status === "Completed") {
+    return "bg-emerald-100 text-emerald-700";
+  }
+
+  if (status === "Planned") {
+    return "bg-blue-100 text-blue-700";
+  }
+
+  return "bg-orange-100 text-orange-700";
+}
+
+export default function AIRecommendations({
+  project,
+}: AIRecommendationsProps) {
+  return (
+    <section className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
+      <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
+        <div>
+          <div className="flex items-center gap-2 text-orange-500">
+            <Sparkles className="h-5 w-5" />
+
+            <p className="text-sm font-bold uppercase tracking-[0.16em]">
+              AI recommendations
+            </p>
+          </div>
+
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+            Best upgrades for this home
+          </h2>
+
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+            Recommendations are ranked using estimated investment, annual
+            energy savings and expected payback period.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-bold text-orange-700 transition hover:bg-orange-100"
+        >
+          View full AI report
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="mt-8 grid gap-6 xl:grid-cols-2">
+        {project.recommendations.map((recommendation, index) => (
+          <article
+            key={recommendation.id}
+            className="group rounded-[26px] border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-lg font-black text-orange-600">
+                  {index + 1}
+                </div>
+
+                <div>
+                  <p className="text-sm font-bold text-orange-500">
+                    {recommendation.category}
+                  </p>
+
+                  <h3 className="mt-1 text-xl font-black text-slate-950">
+                    {recommendation.title}
+                  </h3>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${getPriorityStyle(
+                    recommendation.priority,
+                  )}`}
+                >
+                  {recommendation.priority} priority
+                </span>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${getStatusStyle(
+                    recommendation.status,
+                  )}`}
+                >
+                  {recommendation.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-slate-50 p-4">
+                <div className="flex items-center gap-2 text-slate-500">
+                  <BadgeEuro className="h-4 w-4" />
+
+                  <span className="text-xs font-bold uppercase tracking-wide">
+                    Cost
+                  </span>
+                </div>
+
+                <p className="mt-3 text-lg font-black text-slate-950">
+                  {recommendation.estimatedCost}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-emerald-50 p-4">
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <TrendingUp className="h-4 w-4" />
+
+                  <span className="text-xs font-bold uppercase tracking-wide">
+                    Saving
+                  </span>
+                </div>
+
+                <p className="mt-3 text-lg font-black text-emerald-950">
+                  {recommendation.annualSaving}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-violet-50 p-4">
+                <div className="flex items-center gap-2 text-violet-700">
+                  <Clock3 className="h-4 w-4" />
+
+                  <span className="text-xs font-bold uppercase tracking-wide">
+                    Payback
+                  </span>
+                </div>
+
+                <p className="mt-3 text-lg font-black text-violet-950">
+                  {recommendation.paybackPeriod}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r from-orange-500 to-emerald-500 ${
+                  index === 0
+                    ? "w-[92%]"
+                    : index === 1
+                      ? "w-[81%]"
+                      : index === 2
+                        ? "w-[72%]"
+                        : "w-[64%]"
+                }`}
+              />
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-500"
+            >
+              View recommended products
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
