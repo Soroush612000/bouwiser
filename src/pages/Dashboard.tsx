@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -13,6 +13,7 @@ import {
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { projects } from "../data/projects";
+import { supabase } from "@/utils/supabase";
 
 function parseEuro(value: string) {
   return Number(value.replace(/[^\d]/g, "")) || 0;
@@ -26,46 +27,178 @@ function formatEuro(value: number) {
   }).format(value);
 }
 
+function getDisplayName(fullName: unknown, email?: string) {
+  if (typeof fullName === "string" && fullName.trim()) return fullName.trim();
+
+  if (email) {
+    const emailName = email.split("@")[0];
+    if (emailName) {
+      return emailName
+        .split(/[._-]+/)
+        .filter(Boolean)
+        .map(
+          (part) =>
+            part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+        )
+        .join(" ");
+    }
+  }
+
+  return "Homeowner";
+}
+
+function getInitial(name: string) {
+  return name.trim().charAt(0).toUpperCase() || "H";
+}
+
+type SavedScan = {
+  id: number;
+  createdAt: string;
+  projectName: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  propertyType: string;
+  yearBuilt: string;
+  floorArea: string;
+  energyLabel: string;
+  gasUsage: string;
+  electricityUsage: string;
+  goals: string[];
+  uploadedPhotos: string[];
+  analysis: {
+    confidence: number;
+    targetEnergyLabel: string;
+    annualSaving: number;
+    co2Reduction: number;
+  };
+  status: string;
+  progress: number;
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("dashboard");
+  const [userName, setUserName] = useState("Homeowner");
+  const [userInitial, setUserInitial] = useState("H");
+  const [authLoading, setAuthLoading] = useState(true);
+  const [latestScan, setLatestScan] = useState<SavedScan | null>(null);
+
+  useEffect(() => {
+    try {
+      const savedScan = localStorage.getItem("bouwiser_latest_scan");
+
+      if (savedScan) {
+        setLatestScan(JSON.parse(savedScan) as SavedScan);
+      }
+    } catch (error) {
+      console.error("Could not load the latest Bouwiser scan:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const applySession = (session: any) => {
+      if (!mounted) return;
+
+      if (!session?.user) {
+        setAuthLoading(false);
+        navigate("/", { replace: true });
+        return;
+      }
+
+      const displayName = getDisplayName(
+        session.user.user_metadata?.full_name,
+        session.user.email,
+      );
+
+      setUserName(displayName);
+      setUserInitial(getInitial(displayName));
+      setAuthLoading(false);
+    };
+
+    const loadUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      applySession(session);
+    };
+
+    loadUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      applySession(session);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const dashboardProjects = useMemo(() => {
+    if (!latestScan) return projects;
+
+    const scannedProject = {
+      id: String(latestScan.id),
+      name: latestScan.projectName,
+      propertyType: latestScan.propertyType || "Home",
+      city: latestScan.city || "Unknown city",
+      status: latestScan.status,
+      budget: "To be estimated",
+      progress: latestScan.progress,
+      nextAction: "Review AI renovation recommendations",
+      annualSaving: `€${latestScan.analysis.annualSaving}`,
+      aiScore: latestScan.analysis.confidence,
+      co2Reduction: `${latestScan.analysis.co2Reduction}%`,
+      isLatestScan: true,
+    };
+
+    return [scannedProject, ...projects];
+  }, [latestScan]);
 
   const statistics = useMemo(() => {
-    const activeProjects = projects.filter(
+    const activeProjects = dashboardProjects.filter(
       (project) => project.progress < 100,
     ).length;
 
-    const totalSavings = projects.reduce(
-      (total, project) =>
-        total + parseEuro(project.annualSaving),
+    const totalSavingsValue = dashboardProjects.reduce(
+      (total, project) => total + parseEuro(project.annualSaving),
       0,
     );
 
-    const averageAiScore = Math.round(
-      projects.reduce(
-        (total, project) => total + project.aiScore,
-        0,
-      ) / projects.length,
-    );
+    const averageAiScore =
+      dashboardProjects.length > 0
+        ? Math.round(
+            dashboardProjects.reduce(
+              (total, project) => total + project.aiScore,
+              0,
+            ) / dashboardProjects.length,
+          )
+        : 0;
 
     return [
       {
         title: "Active Projects",
         value: String(activeProjects),
-        description: `${projects.length} total projects`,
+        description: `${dashboardProjects.length} total projects`,
         icon: FolderKanban,
         iconStyle: "bg-orange-100 text-orange-600",
       },
       {
         title: "AI Reports",
-        value: String(projects.length),
+        value: String(dashboardProjects.length),
         description: `${averageAiScore}% average confidence`,
         icon: Bot,
         iconStyle: "bg-violet-100 text-violet-600",
       },
       {
         title: "Estimated Savings",
-        value: formatEuro(totalSavings),
+        value: formatEuro(totalSavingsValue),
         description: "Expected annual savings",
         icon: CircleDollarSign,
         iconStyle: "bg-emerald-100 text-emerald-600",
@@ -78,35 +211,57 @@ export default function Dashboard() {
         iconStyle: "bg-blue-100 text-blue-600",
       },
     ];
-  }, []);
+  }, [dashboardProjects]);
 
-  const totalSavings = projects.reduce(
-    (total, project) =>
-      total + parseEuro(project.annualSaving),
+  const totalSavings = dashboardProjects.reduce(
+    (total, project) => total + parseEuro(project.annualSaving),
     0,
   );
 
-  const averageProgress = Math.round(
-    projects.reduce(
-      (total, project) => total + project.progress,
-      0,
-    ) / projects.length,
-  );
+  const averageProgress =
+    dashboardProjects.length > 0
+      ? Math.round(
+          dashboardProjects.reduce(
+            (total, project) => total + project.progress,
+            0,
+          ) / dashboardProjects.length,
+        )
+      : 0;
 
-  const averageCo2Reduction = Math.round(
-    projects.reduce(
-      (total, project) =>
-        total + Number(project.co2Reduction.replace("%", "")),
-      0,
-    ) / projects.length,
-  );
+  const averageCo2Reduction =
+    dashboardProjects.length > 0
+      ? Math.round(
+          dashboardProjects.reduce(
+            (total, project) =>
+              total + Number(project.co2Reduction.replace("%", "")),
+            0,
+          ) / dashboardProjects.length,
+        )
+      : 0;
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 text-center shadow-sm">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
+          <p className="mt-4 text-sm font-semibold text-slate-600">
+            Loading your Bouwiser workspace...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout
+      userName={userName}
+      userInitial={userInitial}
       sidebar={
         <DashboardSidebar
           activeItem={activeItem}
           onSelect={setActiveItem}
+          userName={userName}
+          userInitial={userInitial}
         />
       }
     >
@@ -118,7 +273,7 @@ export default function Dashboard() {
             </p>
 
             <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">
-              Welcome back, Yousef
+              Welcome back, {userName}
             </h1>
 
             <p className="mt-2 text-slate-500">
@@ -128,6 +283,7 @@ export default function Dashboard() {
 
           <button
             type="button"
+            onClick={() => navigate("/ai-scan")}
             className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
           >
             <Plus className="h-5 w-5" />
@@ -194,12 +350,14 @@ export default function Dashboard() {
             </div>
 
             <div className="mt-7 space-y-5">
-              {projects.slice(0, 4).map((project) => (
+              {dashboardProjects.slice(0, 4).map((project) => (
                 <button
                   key={project.id}
                   type="button"
                   onClick={() =>
-                    navigate(`/projects/${project.id}`)
+                    "isLatestScan" in project && project.isLatestScan
+                      ? navigate("/ai-scan")
+                      : navigate(`/projects/${project.id}`)
                   }
                   className="group w-full rounded-[24px] border border-slate-200 p-5 text-left transition duration-300 hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-lg"
                 >
@@ -233,9 +391,7 @@ export default function Dashboard() {
 
                   <div className="mt-5">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-500">
-                        Project progress
-                      </span>
+                      <span className="text-slate-500">Project progress</span>
 
                       <span className="font-black text-slate-950">
                         {project.progress}%
@@ -245,9 +401,7 @@ export default function Dashboard() {
                     <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-100">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-orange-500 to-emerald-500"
-                        style={{
-                          width: `${project.progress}%`,
-                        }}
+                        style={{ width: `${project.progress}%` }}
                       />
                     </div>
                   </div>
@@ -275,9 +429,7 @@ export default function Dashboard() {
 
             <div className="mt-5 flex items-start justify-between gap-4">
               <div>
-                <p className="text-6xl font-black">
-                  {averageProgress}%
-                </p>
+                <p className="text-6xl font-black">{averageProgress}%</p>
 
                 <p className="mt-2 text-sm text-slate-400">
                   Average project progress
@@ -291,13 +443,8 @@ export default function Dashboard() {
 
             <div className="mt-8">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">
-                  Portfolio completion
-                </span>
-
-                <span className="font-black">
-                  {averageProgress} / 100
-                </span>
+                <span className="text-slate-400">Portfolio completion</span>
+                <span className="font-black">{averageProgress} / 100</span>
               </div>
 
               <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
@@ -313,7 +460,6 @@ export default function Dashboard() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   Annual savings
                 </p>
-
                 <p className="mt-2 text-2xl font-black">
                   {formatEuro(totalSavings)}
                 </p>
@@ -323,7 +469,6 @@ export default function Dashboard() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                   CO₂ reduction
                 </p>
-
                 <p className="mt-2 text-2xl font-black">
                   {averageCo2Reduction}%
                 </p>
@@ -337,7 +482,7 @@ export default function Dashboard() {
 
               <p className="mt-2 text-lg font-black">
                 {
-                  [...projects].sort(
+                  [...dashboardProjects].sort(
                     (a, b) => b.progress - a.progress,
                   )[0].name
                 }
@@ -345,7 +490,7 @@ export default function Dashboard() {
 
               <p className="mt-2 text-sm text-emerald-400">
                 {
-                  [...projects].sort(
+                  [...dashboardProjects].sort(
                     (a, b) => b.progress - a.progress,
                   )[0].progress
                 }

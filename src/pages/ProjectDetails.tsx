@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -15,6 +15,91 @@ import ActivityFeed from "../components/project/ActivityFeed";
 import BudgetCard from "../components/project/BudgetCard";
 
 import { projects } from "../data/projects";
+import { supabase } from "@/utils/supabase";
+
+type ProjectData = (typeof projects)[number];
+
+type SupabaseProject = {
+  id: number;
+  created_at: string | null;
+  user_id: string | null;
+  project_name: string | null;
+  property_type: string | null;
+  construction_year: number | null;
+  postal_code: string | null;
+  city: string | null;
+  floor_area: number | null;
+  current_energy_label: string | null;
+  annual_energy_cost: number | null;
+  heating_type: string | null;
+  renovation_goal: string | null;
+  budget: number | null;
+  status: string | null;
+  target_energy_label: string | null;
+  annual_saving: number | null;
+  ai_score: number | null;
+  co2_reduction: number | null;
+  progress: number | null;
+  next_action: string | null;
+  roi: string | null;
+};
+
+function formatEuro(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return "To be estimated";
+  }
+
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(Number(value));
+}
+
+function mapSupabaseProject(
+  row: SupabaseProject,
+  template: ProjectData,
+): ProjectData {
+  const budget = formatEuro(row.budget);
+  const annualSaving = formatEuro(row.annual_saving);
+  const roi = row.roi?.trim() || "To be estimated";
+
+  /*
+   * Keep the exact ProjectData structure expected by the existing project
+   * components. In particular, `kpis` must remain an ARRAY because KPICards
+   * renders it with project.kpis.map(...).
+   *
+   * For now we clone the existing KPI array from the UI template. We will
+   * connect each KPI value to Supabase separately after this page is stable.
+   */
+  const kpis = template.kpis.map((kpi) => ({ ...kpi }));
+
+  return {
+    ...template,
+    id: row.id,
+    name: row.project_name?.trim() || "My Renovation Project",
+    propertyType: row.property_type?.trim() || "Home",
+    city: row.city?.trim() || "Unknown city",
+    address: row.city?.trim() || "Unknown city",
+    yearBuilt: row.construction_year ?? 0,
+    floorArea: Number(row.floor_area) || 0,
+    currentEnergyLabel: row.current_energy_label?.trim() || "?",
+    targetEnergyLabel: row.target_energy_label?.trim() || "B",
+    status: row.status?.trim() || "AI analysis completed",
+    progress: row.progress ?? 0,
+    budget,
+    annualSaving,
+    roi,
+    aiScore: row.ai_score ?? 0,
+    co2Reduction:
+      row.co2_reduction !== null && row.co2_reduction !== undefined
+        ? `${row.co2_reduction}%`
+        : "0%",
+    nextAction:
+      row.next_action?.trim() || "Review AI renovation recommendations",
+    kpis,
+  };
+}
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -22,12 +107,138 @@ export default function ProjectDetails() {
   const [activeMenu, setActiveMenu] = useState("projects");
   const [activeTab, setActiveTab] = useState("Overview");
 
-  const project = projects.find(
-    (item) => item.id === Number(id),
-  );
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
-  if (!project) {
+  useEffect(() => {
+    let mounted = true;
+
+    const loadProject = async () => {
+      setLoading(true);
+      setNotFound(false);
+      setLoadError("");
+
+      const projectId = Number(id);
+
+      if (!id || Number.isNaN(projectId)) {
+        if (mounted) {
+          setNotFound(true);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const template = projects[0];
+
+      if (!template) {
+        if (mounted) {
+          setLoadError("Project template is unavailable.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+
+      if (userError || !user) {
+        setLoadError("You must be signed in to view this project.");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("Projects")
+        .select("*")
+        .eq("id", projectId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!mounted) return;
+
+      if (error) {
+        console.error("Could not load Bouwiser project:", error);
+        setLoadError("We could not load this project.");
+        setLoading(false);
+        return;
+      }
+
+      if (!data) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      setProject(
+        mapSupabaseProject(data as SupabaseProject, template),
+      );
+      setLoading(false);
+    };
+
+    void loadProject();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  if (notFound) {
     return <Navigate to="/projects" replace />;
+  }
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        sidebar={
+          <DashboardSidebar
+            activeItem={activeMenu}
+            onSelect={setActiveMenu}
+          />
+        }
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[30px] border border-slate-200 bg-white p-10 shadow-sm">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
+            <h1 className="mt-5 text-3xl font-black text-slate-950">
+              Loading project...
+            </h1>
+            <p className="mt-2 text-slate-500">
+              Retrieving your renovation project from Bouwiser.
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (loadError || !project) {
+    return (
+      <DashboardLayout
+        sidebar={
+          <DashboardSidebar
+            activeItem={activeMenu}
+            onSelect={setActiveMenu}
+          />
+        }
+      >
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-[30px] border border-red-200 bg-red-50 p-10">
+            <h1 className="text-3xl font-black text-slate-950">
+              Unable to load project
+            </h1>
+            <p className="mt-2 text-slate-600">
+              {loadError || "The project could not be loaded."}
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
 
   return (

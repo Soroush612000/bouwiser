@@ -1,10 +1,5 @@
 import type { ReactNode } from "react";
-import {
-  Bell,
-  Menu,
-  Search,
-  X,
-} from "lucide-react";
+import { Bell, Menu, Search, X } from "lucide-react";
 import {
   Children,
   cloneElement,
@@ -15,11 +10,15 @@ import {
 interface DashboardLayoutProps {
   sidebar: ReactNode;
   children: ReactNode;
+  userName?: string;
+  userInitial?: string;
 }
 
 export default function DashboardLayout({
   sidebar,
   children,
+  userName = "Homeowner",
+  userInitial = "H",
 }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -41,7 +40,7 @@ export default function DashboardLayout({
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
+    <div className="flex min-h-screen bg-slate-50">
       {sidebar}
 
       {mobileMenuOpen && (
@@ -105,12 +104,12 @@ export default function DashboardLayout({
 
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 font-black text-white shadow-lg shadow-orange-500/20">
-                  S
+                  {userInitial}
                 </div>
 
                 <div className="hidden sm:block">
                   <p className="text-sm font-bold text-slate-950">
-                  Yousef Razmjoo
+                    {userName}
                   </p>
 
                   <p className="text-xs text-slate-500">

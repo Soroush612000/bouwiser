@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/utils/supabase";
 import {
   ArrowLeft,
   ArrowRight,
@@ -218,6 +219,105 @@ export default function AIScan() {
     }
 
     navigate("/");
+  };
+
+  const saveScanProject = async () => {
+    const projectName =
+      form.address || form.city
+        ? `${form.address || "Home"} - ${form.city || ""}`.trim()
+        : "My Renovation Project";
+
+    const scanProject = {
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      projectName,
+      address: form.address,
+      city: form.city,
+      postalCode: form.postalCode,
+      propertyType: form.propertyType,
+      yearBuilt: form.yearBuilt,
+      floorArea: form.floorArea,
+      energyLabel: form.energyLabel,
+      gasUsage: form.gasUsage,
+      electricityUsage: form.electricityUsage,
+      goals: form.goals,
+      uploadedPhotos,
+      analysis: {
+        confidence: 87,
+        targetEnergyLabel: "B",
+        annualSaving: 980,
+        co2Reduction: 31,
+      },
+      status: "AI analysis completed",
+      progress: 100,
+    };
+
+    // Keep the current prototype flow working even if the database request fails.
+    localStorage.setItem(
+      "bouwiser_latest_scan",
+      JSON.stringify(scanProject),
+    );
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      console.error("Could not identify the signed-in user:", userError);
+      window.alert(
+        "Your scan is saved in this browser, but it could not be saved to your account. Please sign in again.",
+      );
+      return false;
+    }
+
+    const constructionYear = Number.parseInt(form.yearBuilt.replace(/[^\d]/g, ""), 10);
+    const floorArea = Number.parseInt(form.floorArea.replace(/[^\d]/g, ""), 10);
+
+    const { data: insertedProject, error: insertError } = await supabase
+      .from("Projects")
+      .insert({
+        user_id: userData.user.id,
+        project_name: projectName,
+        property_type: form.propertyType || null,
+        construction_year: Number.isNaN(constructionYear) ? null : constructionYear,
+        postal_code: form.postalCode || null,
+        city: form.city || null,
+        floor_area: Number.isNaN(floorArea) ? null : floorArea,
+        current_energy_label: form.energyLabel || null,
+        annual_energy_cost: null,
+        heating_type: null,
+        renovation_goal: form.goals.length > 0 ? form.goals.join(", ") : null,
+        budget: null,
+        status: "AI analysis completed",
+        target_energy_label: "B",
+        annual_saving: 980,
+        ai_score: 87,
+        co2_reduction: 31,
+        progress: 100,
+        next_action: "Review AI renovation recommendations",
+        roi: null,
+      })
+      .select("id, created_at")
+      .single();
+
+    if (insertError) {
+      console.error("Could not save the project to Supabase:", insertError);
+      window.alert(
+        "Your scan is saved in this browser, but the database save failed. Please try again.",
+      );
+      return false;
+    }
+
+    const syncedScanProject = {
+      ...scanProject,
+      id: insertedProject.id,
+      createdAt: insertedProject.created_at ?? scanProject.createdAt,
+    };
+
+    localStorage.setItem(
+      "bouwiser_latest_scan",
+      JSON.stringify(syncedScanProject),
+    );
+
+    return true;
   };
 
   const startAnalysis = () => {
@@ -816,7 +916,13 @@ export default function AIScan() {
 
                       <button
                         type="button"
-                        onClick={() => navigate("/dashboard")}
+                        onClick={async () => {
+                          const saved = await saveScanProject();
+
+                          if (saved) {
+                            navigate("/dashboard");
+                          }
+                        }}
                         className="mt-8 inline-flex h-14 items-center gap-2 rounded-2xl bg-slate-950 px-9 font-black text-white shadow-xl shadow-slate-950/20 transition-all duration-300 hover:-translate-y-1 hover:bg-orange-500"
                       >
                         View My Renovation Dashboard

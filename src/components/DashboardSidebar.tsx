@@ -17,53 +17,25 @@ import {
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
+import { supabase } from "@/utils/supabase";
+
 interface DashboardSidebarProps {
   activeItem: string;
   onSelect: (item: string) => void;
   mobile?: boolean;
   onNavigate?: () => void;
+  userName?: string;
+  userInitial?: string;
 }
 
 const menuItems = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    id: "projects",
-    label: "My Projects",
-    icon: FolderKanban,
-    path: "/projects",
-    badge: "3",
-  },
-  {
-    id: "my-home",
-    label: "My Home",
-    icon: Home,
-  },
-  {
-    id: "ai-assistant",
-    label: "AI Assistant",
-    icon: Bot,
-    badge: "AI",
-  },
-  {
-    id: "products",
-    label: "Products",
-    icon: ShoppingBag,
-  },
-  {
-    id: "contractors",
-    label: "Contractors",
-    icon: Users,
-  },
-  {
-    id: "reports",
-    label: "Reports",
-    icon: FileText,
-  },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { id: "projects", label: "My Projects", icon: FolderKanban, path: "/projects", badge: "3" },
+  { id: "my-home", label: "My Home", icon: Home },
+  { id: "ai-assistant", label: "AI Assistant", icon: Bot, badge: "AI" },
+  { id: "products", label: "Products", icon: ShoppingBag },
+  { id: "contractors", label: "Contractors", icon: Users },
+  { id: "reports", label: "Reports", icon: FileText },
 ];
 
 export default function DashboardSidebar({
@@ -71,17 +43,22 @@ export default function DashboardSidebar({
   onSelect,
   mobile = false,
   onNavigate,
+  userName = "Homeowner",
+  userInitial = "H",
 }: DashboardSidebarProps) {
   const navigate = useNavigate();
 
+
   const handleNavigate = (itemId: string, path?: string) => {
     onSelect(itemId);
-
-    if (path) {
-      navigate(path);
-    }
-
+    if (path) navigate(path);
     onNavigate?.();
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onNavigate?.();
+    navigate("/", { replace: true });
   };
 
   return (
@@ -93,7 +70,6 @@ export default function DashboardSidebar({
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-28 top-20 h-72 w-72 rounded-full bg-orange-500/10 blur-3xl" />
         <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
-
         <div
           className="absolute inset-0 opacity-[0.035]"
           style={{
@@ -121,7 +97,6 @@ export default function DashboardSidebar({
             <p className="text-xl font-black tracking-[-0.03em] text-white">
               Bouwiser
             </p>
-
             <p className="truncate text-xs text-slate-500">
               Smart renovation platform
             </p>
@@ -217,7 +192,6 @@ export default function DashboardSidebar({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-orange-300">
                   <Sparkles className="h-4 w-4" />
-
                   <p className="text-[11px] font-black uppercase tracking-[0.16em]">
                     AI renovation score
                   </p>
@@ -231,7 +205,6 @@ export default function DashboardSidebar({
               <div className="mt-4 flex items-end justify-between">
                 <div>
                   <p className="text-4xl font-black tracking-[-0.05em]">87%</p>
-
                   <p className="mt-1 text-xs text-slate-500">
                     Confidence score
                   </p>
@@ -261,7 +234,7 @@ export default function DashboardSidebar({
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
               >
                 View AI report
-                <ArrowIcon />
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </motion.div>
@@ -275,9 +248,7 @@ export default function DashboardSidebar({
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04]">
                 <BadgeEuro className="h-[18px] w-[18px]" />
               </div>
-
               <span className="flex-1 text-left">Subsidies</span>
-
               <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
                 €4,350
               </span>
@@ -291,36 +262,30 @@ export default function DashboardSidebar({
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04]">
                 <Settings className="h-[18px] w-[18px]" />
               </div>
-
               Settings
             </button>
 
             <button
               type="button"
-              onClick={() => {
-                navigate("/");
-                onNavigate?.();
-              }}
+              onClick={handleLogout}
               className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-bold text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.04]">
                 <LogOut className="h-[18px] w-[18px]" />
               </div>
-
               Log out
             </button>
           </div>
 
           <div className="flex items-center gap-3 border-t border-white/10 px-2 pt-5">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 font-black text-white shadow-lg shadow-orange-500/20">
-              S
+              {userInitial}
             </div>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-black text-white">
-              Yousef Razmjoo
+                {userName}
               </p>
-
               <p className="truncate text-xs text-slate-500">Homeowner</p>
             </div>
 
@@ -336,9 +301,4 @@ export default function DashboardSidebar({
         </div>
       </div>
     </aside>
-  );
-}
-
-function ArrowIcon() {
-  return <ChevronRight className="h-4 w-4" />;
-}
+  );}
