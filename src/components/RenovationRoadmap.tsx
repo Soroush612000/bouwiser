@@ -8,7 +8,6 @@ import {
   Coins,
   Euro,
   Home,
-  House,
   Leaf,
   Sparkles,
   TrendingUp,
@@ -73,127 +72,111 @@ const summaryItems = [
     label: "Available subsidy",
     value: "€2,400",
     icon: Coins,
-    iconStyle: "bg-orange-500/15 text-orange-400",
   },
   {
     label: "Annual savings",
     value: "€890",
     icon: TrendingUp,
-    iconStyle: "bg-emerald-500/15 text-emerald-400",
   },
   {
     label: "Estimated payback",
     value: "6 years",
     icon: CalendarDays,
-    iconStyle: "bg-violet-500/15 text-violet-400",
   },
 ];
 
 function getStatusStyles(status: string) {
   if (status === "Completed") {
     return {
-      card: "border-emerald-400/20 bg-emerald-500/[0.06]",
-      icon: "bg-emerald-500/15 text-emerald-400",
-      badge: "bg-emerald-500/10 text-emerald-400",
-      dot: "bg-emerald-400",
+      card: "border-emerald-200 bg-emerald-50/40",
+      icon: "bg-emerald-50 text-emerald-700",
+      badge: "bg-emerald-50 text-emerald-700",
+      dot: "bg-emerald-500",
     };
   }
 
   if (status === "Current") {
     return {
-      card:
-        "border-orange-400/60 bg-orange-500/[0.10] shadow-[0_24px_80px_rgba(249,115,22,0.15)]",
+      card: "border-orange-300 bg-orange-50/60",
       icon: "bg-orange-500 text-white",
       badge: "bg-orange-500 text-white",
-      dot: "bg-orange-400",
+      dot: "bg-orange-500",
     };
   }
 
   return {
-    card: "border-white/10 bg-white/[0.04]",
-    icon: "bg-white/10 text-slate-300",
-    badge: "bg-white/10 text-slate-400",
-    dot: "bg-slate-600",
+    card: "border-slate-200 bg-white",
+    icon: "bg-slate-100 text-slate-600",
+    badge: "bg-slate-100 text-slate-500",
+    dot: "bg-slate-300",
   };
 }
 
 export default function RenovationRoadmap() {
   return (
-    <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-44 top-0 h-[460px] w-[460px] rounded-full bg-orange-500/10 blur-3xl" />
+    <section className="border-t border-slate-100 bg-white py-20 sm:py-24">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
 
-        <div className="absolute -right-44 bottom-0 h-[480px] w-[480px] rounded-full bg-violet-500/10 blur-3xl" />
-
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl text-center"
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-300">
-            <Wrench className="h-4 w-4" />
-            Renovation Roadmap
-          </div>
-
-          <h2 className="mt-6 text-4xl font-black tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-            From home analysis to a clear renovation plan
-          </h2>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-400">
-            Bouwiser transforms complex renovation decisions into a simple,
-            structured and personalized step-by-step journey.
-          </p>
-        </motion.div>
-
+        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          className="mx-auto mt-12 max-w-3xl"
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl"
         >
-          <div className="mb-3 flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-300">
-              Renovation progress
-            </span>
-
-            <span className="font-black text-orange-400">45%</span>
+          <div className="inline-flex items-center gap-2 text-sm font-bold text-orange-600">
+            <Wrench className="h-4 w-4" />
+            Renovation roadmap
           </div>
 
-          <div className="h-3 overflow-hidden rounded-full bg-white/10">
+          <h2 className="mt-4 text-4xl font-extrabold tracking-[-0.035em] text-slate-950 sm:text-5xl">
+            From first insight to
+            <br />
+            a clear renovation plan.
+          </h2>
+
+          <p className="mt-5 text-lg leading-8 text-slate-600">
+            Bouwiser brings your renovation decisions into one structured
+            journey, from understanding your home to comparing solutions and
+            planning the work.
+          </p>
+        </motion.div>
+
+        {/* Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45, delay: 0.1 }}
+          className="mt-10 max-w-2xl"
+        >
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-sm font-semibold text-slate-600">
+              Example renovation journey
+            </span>
+
+            <span className="text-sm font-bold text-orange-600">
+              45%
+            </span>
+          </div>
+
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
             <motion.div
               initial={{ width: 0 }}
               whileInView={{ width: "45%" }}
               viewport={{ once: true }}
-              transition={{ duration: 1.1, delay: 0.35 }}
-              className="h-full rounded-full bg-gradient-to-r from-orange-500 via-orange-400 to-emerald-400"
+              transition={{ duration: 0.9, delay: 0.2 }}
+              className="h-full rounded-full bg-orange-500"
             />
-          </div>
-
-          <div className="mt-3 flex justify-between text-xs font-semibold text-slate-500">
-            <span>Home profile</span>
-            <span>Recommendations</span>
-            <span>Renovation complete</span>
           </div>
         </motion.div>
 
-        <div className="relative mt-16">
-          <div className="absolute left-[8%] right-[8%] top-7 hidden h-px bg-gradient-to-r from-emerald-400/60 via-orange-400/60 to-slate-700 lg:block" />
+        {/* Steps */}
+        <div className="relative mt-12">
+          <div className="absolute left-[8%] right-[8%] top-5 hidden h-px bg-slate-200 lg:block" />
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const styles = getStatusStyles(step.status);
@@ -203,63 +186,57 @@ export default function RenovationRoadmap() {
               return (
                 <motion.article
                   key={step.number}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.25 }}
+                  viewport={{ once: true, amount: 0.2 }}
                   transition={{
-                    duration: 0.5,
-                    delay: index * 0.08,
+                    duration: 0.4,
+                    delay: index * 0.05,
                   }}
-                  whileHover={{ y: -6 }}
-                  className={`group relative rounded-[28px] border p-6 backdrop-blur transition-all duration-300 ${styles.card}`}
+                  className={`relative rounded-2xl border p-5 transition ${styles.card}`}
                 >
                   <div
-                    className={`absolute left-1/2 top-[-11px] hidden h-5 w-5 -translate-x-1/2 rounded-full border-4 border-slate-950 shadow-lg lg:block ${styles.dot}`}
+                    className={`absolute left-1/2 top-[-6px] hidden h-3 w-3 -translate-x-1/2 rounded-full ring-4 ring-white lg:block ${styles.dot}`}
                   />
-
-                  {isCurrent && (
-                    <div className="pointer-events-none absolute inset-0 rounded-[28px] ring-1 ring-inset ring-orange-400/30" />
-                  )}
 
                   <div className="flex items-start justify-between gap-4">
                     <div
-                      className={`flex h-13 w-13 items-center justify-center rounded-2xl ${styles.icon}`}
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${styles.icon}`}
                     >
-                      <Icon className="h-6 w-6" />
+                      <Icon className="h-5 w-5" />
                     </div>
 
-                    <span className="text-sm font-black text-slate-600">
+                    <span className="text-xs font-bold text-slate-400">
                       {step.number}
                     </span>
                   </div>
 
-                  <div className="mt-6 flex items-center gap-2">
-                    <h3 className="text-xl font-black">{step.title}</h3>
+                  <div className="mt-5 flex items-center gap-2">
+                    <h3 className="font-bold text-slate-950">
+                      {step.title}
+                    </h3>
 
                     {isCompleted && (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     )}
 
                     {isCurrent && (
-                      <span className="relative flex h-3 w-3">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-60" />
-                        <span className="relative inline-flex h-3 w-3 rounded-full bg-orange-400" />
-                      </span>
+                      <span className="h-2 w-2 rounded-full bg-orange-500" />
                     )}
                   </div>
 
-                  <p className="mt-3 min-h-[84px] text-sm leading-7 text-slate-400">
+                  <p className="mt-2 min-h-[48px] text-sm leading-6 text-slate-600">
                     {step.description}
                   </p>
 
-                  <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-5">
+                  <div className="mt-5 flex items-center justify-between border-t border-slate-200/70 pt-4">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${styles.badge}`}
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles.badge}`}
                     >
                       {step.status}
                     </span>
 
-                    <ArrowRight className="h-4 w-4 text-slate-500 transition-all duration-300 group-hover:translate-x-1 group-hover:text-white" />
+                    <ArrowRight className="h-4 w-4 text-slate-400" />
                   </div>
                 </motion.article>
               );
@@ -267,12 +244,13 @@ export default function RenovationRoadmap() {
           </div>
         </div>
 
+        {/* Summary */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.55 }}
-          className="mt-10 grid gap-4 rounded-[28px] border border-white/10 bg-white/[0.05] p-5 backdrop-blur sm:grid-cols-3"
+          viewport={{ once: true }}
+          transition={{ duration: 0.45 }}
+          className="mt-8 grid gap-3 sm:grid-cols-3"
         >
           {summaryItems.map((item) => {
             const Icon = item.icon;
@@ -280,74 +258,81 @@ export default function RenovationRoadmap() {
             return (
               <div
                 key={item.label}
-                className="flex items-center gap-4 rounded-2xl border border-white/5 bg-black/20 p-4 transition hover:border-white/10 hover:bg-black/30"
+                className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4"
               >
-                <div
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${item.iconStyle}`}
-                >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-orange-600">
                   <Icon className="h-5 w-5" />
                 </div>
 
                 <div>
-                  <p className="text-sm text-slate-400">{item.label}</p>
-                  <p className="mt-1 text-xl font-black">{item.value}</p>
+                  <p className="text-xs text-slate-500">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 text-lg font-extrabold text-slate-950">
+                    {item.value}
+                  </p>
                 </div>
               </div>
             );
           })}
         </motion.div>
 
+        {/* Completion preview */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.6 }}
-          className="relative mt-10 overflow-hidden rounded-[32px] border border-emerald-400/20 bg-gradient-to-br from-emerald-500/10 via-white/[0.04] to-orange-500/10 p-7 sm:p-9"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45 }}
+          className="mt-8 rounded-2xl border border-slate-200 bg-slate-950 px-6 py-6 text-white sm:px-7"
         >
-          <div className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-xl font-bold">
+                  Renovation complete
+                </h3>
 
-          <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-xl shadow-emerald-500/20">
-                <House className="h-8 w-8" />
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                  <Check className="h-3.5 w-3.5" />
+                  Target achieved
+                </span>
+              </div>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                Bring recommendations, product choices, costs and planning
+                together in one completed renovation journey.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <Zap className="h-4 w-4 text-orange-400" />
+                <p className="mt-2 text-xs text-slate-400">
+                  Energy label
+                </p>
+                <p className="mt-1 font-bold">
+                  B
+                </p>
               </div>
 
               <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-2xl font-black">
-                    Renovation Complete
-                  </h3>
-
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-400">
-                    <Check className="h-3.5 w-3.5" />
-                    Target achieved
-                  </span>
-                </div>
-
-                <p className="mt-2 max-w-2xl leading-7 text-slate-400">
-                  Complete the roadmap and transform your home into a more
-                  comfortable, efficient and valuable property.
+                <Leaf className="h-4 w-4 text-emerald-400" />
+                <p className="mt-2 text-xs text-slate-400">
+                  CO₂ reduction
+                </p>
+                <p className="mt-1 font-bold">
+                  32%
                 </p>
               </div>
-            </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-2xl bg-white/[0.06] p-4 text-center">
-                <Zap className="mx-auto h-5 w-5 text-orange-400" />
-                <p className="mt-2 text-xs text-slate-400">Energy label</p>
-                <p className="mt-1 text-xl font-black">B</p>
-              </div>
-
-              <div className="rounded-2xl bg-white/[0.06] p-4 text-center">
-                <Leaf className="mx-auto h-5 w-5 text-emerald-400" />
-                <p className="mt-2 text-xs text-slate-400">CO₂ reduction</p>
-                <p className="mt-1 text-xl font-black">32%</p>
-              </div>
-
-              <div className="rounded-2xl bg-white/[0.06] p-4 text-center">
-                <TrendingUp className="mx-auto h-5 w-5 text-violet-400" />
-                <p className="mt-2 text-xs text-slate-400">Annual saving</p>
-                <p className="mt-1 text-xl font-black">€890</p>
+              <div>
+                <TrendingUp className="h-4 w-4 text-violet-400" />
+                <p className="mt-2 text-xs text-slate-400">
+                  Annual saving
+                </p>
+                <p className="mt-1 font-bold">
+                  €890
+                </p>
               </div>
             </div>
           </div>

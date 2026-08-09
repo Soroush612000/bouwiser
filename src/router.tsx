@@ -7,6 +7,7 @@ import ProjectDetails from "./pages/ProjectDetails";
 import AIScan from "./pages/AIScan";
 import Energy from "./pages/Energy";
 import AIAssistant from "./pages/AIAssistant";
+import Products from "./pages/Products";
 import Compare from "./pages/Compare";
 import Hub from "./pages/Hub";
 import About from "./pages/About";
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
   { path: "/ai-scan", element: <AIScan /> },
   { path: "/energy", element: <Energy /> },
   { path: "/ai", element: <AIAssistant /> },
+  { path: "/products", element: <Products /> },
   { path: "/compare", element: <Compare /> },
   { path: "/hub", element: <Hub /> },
   { path: "/about", element: <About /> },

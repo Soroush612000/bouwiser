@@ -1,296 +1,322 @@
-import { motion } from "framer-motion";
 import {
   ArrowRight,
-  BadgeEuro,
   CheckCircle2,
-  CircleDollarSign,
+  Euro,
   Gauge,
+  GlassWater,
   Home,
   Leaf,
-  TrendingUp,
-  Zap,
+  ThermometerSun,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
-
-const metrics = [
-  {
-    title: "Annual Saving",
-    value: "€980",
-    description: "Estimated yearly energy saving",
-    icon: CircleDollarSign,
-    iconClass: "bg-emerald-100 text-emerald-600",
-  },
-  {
-    title: "CO₂ Reduction",
-    value: "31%",
-    description: "Lower household emissions",
-    icon: Leaf,
-    iconClass: "bg-green-100 text-green-600",
-  },
-  {
-    title: "Home Value",
-    value: "+€22K",
-    description: "Estimated property value increase",
-    icon: TrendingUp,
-    iconClass: "bg-blue-100 text-blue-600",
-  },
-  {
-    title: "Payback Period",
-    value: "6.2 yrs",
-    description: "Expected return on investment",
-    icon: Gauge,
-    iconClass: "bg-orange-100 text-orange-600",
-  },
-];
-
-const upgrades = [
+const measures = [
   {
     name: "Roof insulation",
-    saving: "€310/year",
-    progress: 92,
+    description:
+      "Reduce heat loss through the roof and improve indoor comfort.",
+    impact: "High",
+    icon: Home,
+    category: "Insulation",
   },
   {
-    name: "Triple glazing",
-    saving: "€220/year",
-    progress: 76,
+    name: "High-performance glazing",
+    description:
+      "Improve thermal comfort and reduce heat loss through windows.",
+    impact: "High",
+    icon: GlassWater,
+    category: "Windows",
   },
   {
     name: "Hybrid heat pump",
-    saving: "€290/year",
-    progress: 84,
-  },
-  {
-    name: "Solar panels",
-    saving: "€160/year",
-    progress: 68,
+    description:
+      "Reduce gas consumption by combining a heat pump with an existing boiler.",
+    impact: "Medium–High",
+    icon: ThermometerSun,
+    category: "Heating",
   },
 ];
 
 export default function EnergyDashboard() {
+  const navigate = useNavigate();
+
   return (
-    <section className="relative overflow-hidden bg-white py-24 lg:py-28">
-      <div className="absolute left-[-160px] top-10 h-96 w-96 rounded-full bg-orange-100/60 blur-3xl" />
-      <div className="absolute bottom-[-120px] right-[-100px] h-96 w-96 rounded-full bg-emerald-100/50 blur-3xl" />
-
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-orange-500">
-            Home Energy Dashboard
-          </p>
-
-          <h2 className="mt-5 text-4xl font-black tracking-[-0.03em] text-slate-950 sm:text-5xl lg:text-6xl">
-            See your home’s full energy potential
-          </h2>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            Understand your current energy performance, possible savings,
-            recommended upgrades, subsidies, and expected return on investment.
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.6 }}
-            className="rounded-[32px] bg-slate-950 p-8 text-white shadow-2xl shadow-slate-950/20 sm:p-10"
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-slate-400">
-                  Current Energy Performance
-                </p>
-
-                <h3 className="mt-2 text-2xl font-black">
-                  Your energy score
-                </h3>
-              </div>
-
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-                <Zap className="h-6 w-6 text-orange-400" />
-              </div>
+    <main className="bg-white">
+      {/* Hero */}
+      <section className="border-b border-slate-200">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 text-sm font-bold text-orange-600">
+              <Leaf className="h-4 w-4" strokeWidth={1.8} />
+              Energy improvement
             </div>
 
-            <div className="mt-10 grid grid-cols-[1fr_auto_1fr] items-center gap-5">
-              <div className="rounded-3xl bg-white/10 p-6 text-center">
-                <p className="text-sm text-slate-400">
-                  Current label
-                </p>
+            <h1 className="mt-5 max-w-4xl text-5xl font-extrabold tracking-[-0.045em] text-slate-950 sm:text-6xl">
+              Improve your home's
+              <br />
+              energy performance.
+            </h1>
 
-                <div className="mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-orange-500 text-5xl font-black">
-                  D
-                </div>
-              </div>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+              Understand how renovation measures can reduce energy use,
+              improve comfort and support a better energy label.
+            </p>
 
-              <ArrowRight className="h-7 w-7 text-slate-500" />
-
-              <div className="rounded-3xl bg-white/10 p-6 text-center">
-                <p className="text-sm text-slate-400">
-                  Potential label
-                </p>
-
-                <div className="mx-auto mt-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-emerald-500 text-5xl font-black">
-                  B
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">
-                  Energy score
-                </span>
-
-                <span className="font-bold text-white">
-                  67 / 100
-                </span>
-              </div>
-
-              <div className="mt-3 h-3 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  initial={{ width: 0 }}
-                  whileInView={{ width: "67%" }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                  className="h-full rounded-full bg-gradient-to-r from-orange-500 to-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <BadgeEuro className="h-5 w-5 text-orange-400" />
-
-                <p className="mt-4 text-sm text-slate-400">
-                  Estimated investment
-                </p>
-
-                <p className="mt-1 text-2xl font-black">
-                  €12,800
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <Home className="h-5 w-5 text-emerald-400" />
-
-                <p className="mt-4 text-sm text-slate-400">
-                  Available subsidies
-                </p>
-
-                <p className="mt-1 text-2xl font-black">
-                  €4,350
-                </p>
-              </div>
-            </div>
-
-            <Button className="mt-8 h-12 w-full rounded-xl bg-orange-500 text-base text-white hover:bg-orange-600">
-              View Full Energy Roadmap
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </motion.div>
-
-          <div className="space-y-8">
-            <div className="grid gap-5 sm:grid-cols-2">
-              {metrics.map((metric, index) => {
-                const Icon = metric.icon;
-
-                return (
-                  <motion.div
-                    key={metric.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.08,
-                    }}
-                    className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl ${metric.iconClass}`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </div>
-
-                    <p className="mt-5 text-sm font-medium text-slate-500">
-                      {metric.title}
-                    </p>
-
-                    <p className="mt-1 text-3xl font-black text-slate-950">
-                      {metric.value}
-                    </p>
-
-                    <p className="mt-2 text-sm leading-6 text-slate-500">
-                      {metric.description}
-                    </p>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6 }}
-              className="rounded-[30px] border border-slate-200 bg-slate-50 p-7 sm:p-8"
+            <button
+              type="button"
+              onClick={() => navigate("/ai-scan")}
+              className="group mt-8 inline-flex h-12 items-center justify-center rounded-xl bg-slate-950 px-6 text-sm font-bold text-white transition hover:bg-orange-600"
             >
-              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <div>
-                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">
-                    Recommended upgrades
-                  </p>
+              Analyse my home
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </button>
 
-                  <h3 className="mt-2 text-2xl font-black text-slate-950">
-                    Best next steps for your home
-                  </h3>
-                </div>
+            <p className="mt-3 text-xs leading-5 text-slate-400">
+              Personalised results depend on the information provided about
+              your home.
+            </p>
+          </div>
+        </div>
+      </section>
 
-                <div className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700">
-                  Label B achievable
-                </div>
+      {/* Example journey */}
+      <section className="border-b border-slate-200 bg-slate-50/60">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-600">
+                Example home scenario
+              </p>
+
+              <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.03em] text-slate-950 sm:text-4xl">
+                See how renovation measures work together.
+              </h2>
+
+              <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
+                This example illustrates how several improvements could
+                contribute to better overall energy performance.
+              </p>
+            </div>
+
+            <span className="w-fit rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-500">
+              Illustrative example
+            </span>
+          </div>
+
+          <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_auto_1.4fr_auto_1fr] lg:items-stretch">
+            {/* Current */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                <Gauge className="h-5 w-5" strokeWidth={1.8} />
               </div>
 
-              <div className="mt-8 space-y-6">
-                {upgrades.map((upgrade, index) => (
-                  <div key={upgrade.name}>
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                Current example
+              </p>
 
-                        <span className="font-semibold text-slate-800">
-                          {upgrade.name}
-                        </span>
-                      </div>
+              <div className="mt-3 flex items-end gap-3">
+                <span className="text-4xl font-extrabold tracking-tight text-slate-950">
+                  Label D
+                </span>
+              </div>
 
-                      <span className="text-sm font-bold text-slate-600">
-                        {upgrade.saving}
-                      </span>
-                    </div>
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                The starting point used for this example renovation journey.
+              </p>
+            </div>
 
-                    <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-slate-200">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{
-                          width: `${upgrade.progress}%`,
-                        }}
-                        viewport={{ once: true }}
-                        transition={{
-                          duration: 0.8,
-                          delay: index * 0.1,
-                        }}
-                        className="h-full rounded-full bg-gradient-to-r from-orange-500 to-emerald-500"
-                      />
-                    </div>
+            <div className="hidden items-center justify-center lg:flex">
+              <ArrowRight className="h-5 w-5 text-slate-300" />
+            </div>
+
+            {/* Improvements */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                <Home className="h-5 w-5" strokeWidth={1.8} />
+              </div>
+
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+                Example improvements
+              </p>
+
+              <div className="mt-4 space-y-3">
+                {[
+                  "Improve roof insulation",
+                  "Upgrade glazing",
+                  "Improve the heating system",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-3">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+
+                    <span className="text-sm font-semibold text-slate-700">
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
+
+            <div className="hidden items-center justify-center lg:flex">
+              <ArrowRight className="h-5 w-5 text-slate-300" />
+            </div>
+
+            {/* Potential */}
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                <Leaf className="h-5 w-5" strokeWidth={1.8} />
+              </div>
+
+              <p className="mt-6 text-xs font-bold uppercase tracking-[0.12em] text-emerald-700">
+                Potential outcome
+              </p>
+
+              <p className="mt-3 text-4xl font-extrabold tracking-tight text-slate-950">
+                Label B
+              </p>
+
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                Potentially lower energy use and improved thermal comfort.
+              </p>
+            </div>
           </div>
+
+          <p className="mt-5 text-xs leading-5 text-slate-400">
+            Energy-label outcomes depend on the property, existing building
+            characteristics and the measures implemented.
+          </p>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Measures */}
+      <section>
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-600">
+              Renovation measures
+            </p>
+
+            <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.03em] text-slate-950 sm:text-4xl">
+              Where can energy performance improve?
+            </h2>
+
+            <p className="mt-4 text-base leading-7 text-slate-600">
+              Different parts of a home influence energy consumption and
+              comfort. Bouwiser helps bring those improvement options together.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {measures.map((measure) => {
+              const Icon = measure.icon;
+
+              return (
+                <article
+                  key={measure.name}
+                  className="group flex min-h-[310px] flex-col rounded-2xl border border-slate-200 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-900/5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                      <Icon className="h-5 w-5" strokeWidth={1.8} />
+                    </div>
+
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      {measure.impact} impact
+                    </span>
+                  </div>
+
+                  <h3 className="mt-6 text-xl font-bold text-slate-950">
+                    {measure.name}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    {measure.description}
+                  </p>
+
+                  <div className="mt-auto pt-7">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/products")}
+                      className="inline-flex items-center text-sm font-bold text-slate-900 transition group-hover:text-orange-600"
+                    >
+                      Explore {measure.category.toLowerCase()}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          {/* Costs / savings explanation */}
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-7">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm">
+                <Euro className="h-5 w-5" strokeWidth={1.8} />
+              </div>
+
+              <h3 className="mt-5 text-lg font-bold text-slate-950">
+                Costs depend on your project
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Product choice, property size, installation requirements and
+                existing conditions all influence the final investment.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-7">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
+                <Leaf className="h-5 w-5" strokeWidth={1.8} />
+              </div>
+
+              <h3 className="mt-5 text-lg font-bold text-slate-950">
+                Savings are property-specific
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Potential savings depend on current energy use, the building
+                envelope, heating system, household behaviour and the measures
+                selected.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="mt-12 overflow-hidden rounded-3xl bg-slate-950 px-7 py-8 text-white sm:px-9 sm:py-9">
+            <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-sm font-bold text-orange-400">
+                  Your home is different.
+                </p>
+
+                <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.02em] sm:text-3xl">
+                  Find renovation opportunities for your own home.
+                </h2>
+
+                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
+                  Add basic property information to receive a more relevant
+                  starting point for your renovation decisions.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate("/ai-scan")}
+                className="group inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-orange-500 px-6 text-sm font-bold text-white transition hover:bg-orange-600"
+              >
+                Start AI Home Scan
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </div>
+
+          <p className="mx-auto mt-5 max-w-3xl text-center text-xs leading-5 text-slate-400">
+            Bouwiser provides decision-support information for renovation
+            planning. Actual energy performance, costs, savings and energy-label
+            improvements depend on the individual property and implementation.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }

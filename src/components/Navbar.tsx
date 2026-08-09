@@ -1,83 +1,166 @@
-import { Globe2 } from "lucide-react";
+import { ChevronDown, Globe2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 import LoginModal from "./LoginModal";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [productsOpen, setProductsOpen] = useState(false);
+
+  const linkStyle =
+    "whitespace-nowrap px-1 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-950";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-        <Link
-          to="/"
-          className="flex items-center gap-3 transition-transform duration-300 hover:scale-[1.02]"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-xl font-black text-white shadow-lg shadow-orange-500/25">
-            B
+    <>
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-8 px-6 lg:px-8">
+
+          {/* Logo */}
+          <Link to="/" className="shrink-0">
+            <div>
+              <p className="text-[22px] font-bold tracking-[-0.03em] text-slate-950">
+                BOU
+                <span className="text-[#a90f35]">W</span>
+                ISER
+              </p>
+
+              <p className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.2em] text-slate-400">
+                Smart Renovation Platform
+              </p>
+            </div>
+          </Link>
+
+          {/* Navigation */}
+          <nav className="hidden items-center gap-7 lg:flex">
+            <Link className={linkStyle} to="/">
+              Home
+            </Link>
+
+            {/* Products */}
+            <div
+              className="relative"
+              onMouseEnter={() => setProductsOpen(true)}
+              onMouseLeave={() => setProductsOpen(false)}
+            >
+              <button
+                type="button"
+                className={`${linkStyle} flex items-center gap-1`}
+                onClick={() => navigate("/products")}
+              >
+                Products
+                <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.8} />
+              </button>
+
+              {productsOpen && (
+                <div className="absolute left-1/2 top-full z-50 w-[340px] -translate-x-1/2 pt-3">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-lg shadow-slate-900/5">
+
+                    <Link
+                      to="/products"
+                      className="block rounded-lg p-3 transition hover:bg-slate-50"
+                    >
+                      <p className="text-sm font-semibold text-slate-900">
+                        Browse & compare products
+                      </p>
+
+                      <p className="mt-1 text-sm leading-5 text-slate-500">
+                        Compare building products, prices and performance.
+                      </p>
+                    </Link>
+
+                    <div className="my-3 border-t border-slate-100" />
+
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                      {[
+                        "Insulation",
+                        "Windows",
+                        "Flooring",
+                        "Heating",
+                        "Solar",
+                        "Materials",
+                      ].map((item) => (
+                        <Link
+                          key={item}
+                          to="/products"
+                          className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-950"
+                        >
+                          {item}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Link className={linkStyle} to="/compare">
+              Compare
+            </Link>
+
+            <Link className={linkStyle} to="/energy">
+              Energy
+            </Link>
+
+            <Link className={linkStyle} to="/ai">
+              AI Assistant
+            </Link>
+
+            <Link className={linkStyle} to="/hub">
+              Partners
+            </Link>
+
+            <Link className={linkStyle} to="/about">
+              About
+            </Link>
+
+            <Link className={linkStyle} to="/contact">
+              Contact
+            </Link>
+          </nav>
+
+          {/* Right side */}
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              className="hidden items-center gap-1.5 px-2 py-2 text-sm font-medium text-slate-500 transition hover:text-slate-900 xl:flex"
+            >
+              <Globe2 className="h-4 w-4" strokeWidth={1.8} />
+              EN
+            </button>
+
+            <LoginModal />
+
+            <button
+              type="button"
+              onClick={() => navigate("/ai-scan")}
+              className="hidden h-10 items-center justify-center rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-[#a90f35] xl:flex"
+            >
+              Start AI Scan
+            </button>
           </div>
+        </div>
+      </header>
 
-          <div>
-            <p className="text-2xl font-black tracking-tight text-slate-950">
-              BOU<span className="text-orange-500">W</span>ISER
-            </p>
+      {/* Product comparison strip */}
+      <div className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto flex min-h-9 max-w-7xl items-center justify-center gap-3 px-6 text-xs lg:px-8">
+          <span className="font-semibold text-slate-700">
+            Compare smarter.
+          </span>
 
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
-              Smart Renovation Platform
-            </p>
-          </div>
-        </Link>
+          <span className="hidden text-slate-500 md:inline">
+            Compare products, specifications and retailer prices in one place.
+          </span>
 
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-700 lg:flex">
-          <Link className="transition hover:text-orange-500" to="/">
-            Home
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/energy">
-            Energy
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/ai">
-            AI Assistant
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/compare">
-            Compare
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/hub">
-            Hub
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/about">
-            About
-          </Link>
-
-          <Link className="transition hover:text-orange-500" to="/contact">
-            Contact
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-all duration-300 hover:bg-slate-50 sm:flex"
+          <Link
+            to="/products"
+            className="font-semibold text-[#a90f35] transition hover:text-slate-950"
           >
-            <Globe2 className="h-4 w-4" />
-            EN
-          </button>
-
-          <LoginModal />
-
-          <button
-            type="button"
-            onClick={() => navigate("/ai-scan")}
-            className="hidden rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-orange-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-orange-500/40 sm:block"
-          >
-            Start Your Scan
-          </button>
+            Explore products →
+          </Link>
         </div>
       </div>
-    </header>
+    </>
   );
 }

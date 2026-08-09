@@ -1,50 +1,67 @@
+import {
+  BrainCircuit,
+  Home,
+  Users,
+  Route,
+} from "lucide-react";
+
+const items = [
+  {
+    icon: BrainCircuit,
+    title: "AI guidance",
+  },
+  {
+    icon: Home,
+    title: "Energy insights",
+  },
+  {
+    icon: Users,
+    title: "Renovation expertise",
+  },
+  {
+    icon: Route,
+    title: "Personal roadmap",
+  },
+];
+
 export default function TrustedBy() {
-    const items = [
-      {
-        title: "AI Powered",
-        subtitle: "Smart renovation advice",
-      },
-      {
-        title: "Energy Label",
-        subtitle: "A–G Assessment",
-      },
-      {
-        title: "Building Experts",
-        subtitle: "Verified professionals",
-      },
-      {
-        title: "Personal Roadmap",
-        subtitle: "Step-by-step guidance",
-      },
-    ];
-  
-    return (
-      <section className="bg-slate-50 border-y border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-14">
-  
-          <p className="text-center text-sm uppercase tracking-[0.25em] text-slate-500">
-            Trusted technology for smarter renovation
-          </p>
-  
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-  
-            {items.map((item) => (
+  return (
+    <section className="border-y border-slate-200 bg-white">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4">
+          {items.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
               <div
                 key={item.title}
-                className="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-lg transition"
+                className={`flex items-center justify-center gap-3 py-5 text-slate-600 ${
+                  index % 2 !== 0
+                    ? "border-l border-slate-200"
+                    : ""
+                } ${
+                  index > 1
+                    ? "border-t border-slate-200 lg:border-t-0"
+                    : ""
+                } ${
+                  index > 0
+                    ? "lg:border-l lg:border-slate-200"
+                    : ""
+                }`}
               >
-                <h3 className="text-lg font-bold text-slate-900">
+                <Icon
+                  className="h-4 w-4 text-[#a90f35]"
+                  strokeWidth={1.8}
+                />
+
+                <span className="text-sm font-medium">
                   {item.title}
-                </h3>
-  
-                <p className="mt-2 text-sm text-slate-500">
-                  {item.subtitle}
-                </p>
+                </span>
               </div>
-            ))}
-  
-          </div>
+            );
+          })}
         </div>
-      </section>
-    );
-  }
+      </div>
+    </section>
+  );
+}
