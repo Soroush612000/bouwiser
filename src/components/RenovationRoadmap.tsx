@@ -15,78 +15,12 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
-const steps = [
-  {
-    number: "01",
-    title: "Home Profile",
-    description:
-      "Add your property details, energy label and renovation photos.",
-    icon: Home,
-    status: "Completed",
-  },
-  {
-    number: "02",
-    title: "AI Analysis",
-    description:
-      "Bouwiser analyses energy performance and renovation opportunities.",
-    icon: Bot,
-    status: "Completed",
-  },
-  {
-    number: "03",
-    title: "Recommendations",
-    description:
-      "Receive prioritized improvements matched to your property and goals.",
-    icon: Sparkles,
-    status: "Current",
-  },
-  {
-    number: "04",
-    title: "Cost Estimate",
-    description:
-      "Review expected investment, subsidies, savings and payback period.",
-    icon: Euro,
-    status: "Next",
-  },
-  {
-    number: "05",
-    title: "Compare Products",
-    description:
-      "Compare materials, systems, products, installers and stores.",
-    icon: ClipboardCheck,
-    status: "Next",
-  },
-  {
-    number: "06",
-    title: "Plan Renovation",
-    description:
-      "Create your implementation schedule, budget and renovation roadmap.",
-    icon: CalendarDays,
-    status: "Next",
-  },
-];
+type StepStatus = "completed" | "current" | "next";
 
-const summaryItems = [
-  {
-    label: "Available subsidy",
-    value: "€2,400",
-    icon: Coins,
-  },
-  {
-    label: "Annual savings",
-    value: "€890",
-    icon: TrendingUp,
-  },
-  {
-    label: "Estimated payback",
-    value: "6 years",
-    icon: CalendarDays,
-  },
-];
-
-function getStatusStyles(status: string) {
-  if (status === "Completed") {
+function getStatusStyles(status: StepStatus) {
+  if (status === "completed") {
     return {
       card: "border-emerald-200 bg-emerald-50/40",
       icon: "bg-emerald-50 text-emerald-700",
@@ -95,7 +29,7 @@ function getStatusStyles(status: string) {
     };
   }
 
-  if (status === "Current") {
+  if (status === "current") {
     return {
       card: "border-orange-300 bg-orange-50/60",
       icon: "bg-orange-500 text-white",
@@ -113,6 +47,83 @@ function getStatusStyles(status: string) {
 }
 
 export default function RenovationRoadmap() {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      number: "01",
+      title: t("roadmap.steps.homeProfile.title"),
+      description: t("roadmap.steps.homeProfile.description"),
+      icon: Home,
+      status: "completed" as StepStatus,
+    },
+    {
+      number: "02",
+      title: t("roadmap.steps.aiAnalysis.title"),
+      description: t("roadmap.steps.aiAnalysis.description"),
+      icon: Bot,
+      status: "completed" as StepStatus,
+    },
+    {
+      number: "03",
+      title: t("roadmap.steps.recommendations.title"),
+      description: t("roadmap.steps.recommendations.description"),
+      icon: Sparkles,
+      status: "current" as StepStatus,
+    },
+    {
+      number: "04",
+      title: t("roadmap.steps.costEstimate.title"),
+      description: t("roadmap.steps.costEstimate.description"),
+      icon: Euro,
+      status: "next" as StepStatus,
+    },
+    {
+      number: "05",
+      title: t("roadmap.steps.compareProducts.title"),
+      description: t("roadmap.steps.compareProducts.description"),
+      icon: ClipboardCheck,
+      status: "next" as StepStatus,
+    },
+    {
+      number: "06",
+      title: t("roadmap.steps.planRenovation.title"),
+      description: t("roadmap.steps.planRenovation.description"),
+      icon: CalendarDays,
+      status: "next" as StepStatus,
+    },
+  ];
+
+  const summaryItems = [
+    {
+      label: t("roadmap.summary.subsidy"),
+      value: "€2,400",
+      icon: Coins,
+    },
+    {
+      label: t("roadmap.summary.annualSavings"),
+      value: "€890",
+      icon: TrendingUp,
+    },
+    {
+      label: t("roadmap.summary.payback"),
+      value: t("roadmap.summary.paybackValue"),
+      icon: CalendarDays,
+    },
+  ];
+
+  const statusText = (status: StepStatus) => {
+    if (status === "completed") {
+      return t("roadmap.status.completed");
+    }
+
+    if (status === "current") {
+      return t("roadmap.status.current");
+    }
+
+    return t("roadmap.status.next");
+  };
+
   return (
     <section className="border-t border-slate-100 bg-white py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -127,19 +138,17 @@ export default function RenovationRoadmap() {
         >
           <div className="inline-flex items-center gap-2 text-sm font-bold text-orange-600">
             <Wrench className="h-4 w-4" />
-            Renovation roadmap
+            {t("roadmap.label")}
           </div>
 
           <h2 className="mt-4 text-4xl font-extrabold tracking-[-0.035em] text-slate-950 sm:text-5xl">
-            From first insight to
+            {t("roadmap.titleLine1")}
             <br />
-            a clear renovation plan.
+            {t("roadmap.titleLine2")}
           </h2>
 
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            Bouwiser brings your renovation decisions into one structured
-            journey, from understanding your home to comparing solutions and
-            planning the work.
+            {t("roadmap.description")}
           </p>
         </motion.div>
 
@@ -153,7 +162,7 @@ export default function RenovationRoadmap() {
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="text-sm font-semibold text-slate-600">
-              Example renovation journey
+              {t("roadmap.exampleJourney")}
             </span>
 
             <span className="text-sm font-bold text-orange-600">
@@ -180,8 +189,8 @@ export default function RenovationRoadmap() {
             {steps.map((step, index) => {
               const Icon = step.icon;
               const styles = getStatusStyles(step.status);
-              const isCompleted = step.status === "Completed";
-              const isCurrent = step.status === "Current";
+              const isCompleted = step.status === "completed";
+              const isCurrent = step.status === "current";
 
               return (
                 <motion.article
@@ -233,7 +242,7 @@ export default function RenovationRoadmap() {
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles.badge}`}
                     >
-                      {step.status}
+                      {statusText(step.status)}
                     </span>
 
                     <ArrowRight className="h-4 w-4 text-slate-400" />
@@ -268,6 +277,7 @@ export default function RenovationRoadmap() {
                   <p className="text-xs text-slate-500">
                     {item.label}
                   </p>
+
                   <p className="mt-1 text-lg font-extrabold text-slate-950">
                     {item.value}
                   </p>
@@ -289,18 +299,17 @@ export default function RenovationRoadmap() {
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h3 className="text-xl font-bold">
-                  Renovation complete
+                  {t("roadmap.completion.title")}
                 </h3>
 
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-300">
                   <Check className="h-3.5 w-3.5" />
-                  Target achieved
+                  {t("roadmap.completion.targetAchieved")}
                 </span>
               </div>
 
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                Bring recommendations, product choices, costs and planning
-                together in one completed renovation journey.
+                {t("roadmap.completion.description")}
               </p>
             </div>
 
@@ -308,35 +317,30 @@ export default function RenovationRoadmap() {
               <div>
                 <Zap className="h-4 w-4 text-orange-400" />
                 <p className="mt-2 text-xs text-slate-400">
-                  Energy label
+                  {t("roadmap.completion.energyLabel")}
                 </p>
-                <p className="mt-1 font-bold">
-                  B
-                </p>
+                <p className="mt-1 font-bold">B</p>
               </div>
 
               <div>
                 <Leaf className="h-4 w-4 text-emerald-400" />
                 <p className="mt-2 text-xs text-slate-400">
-                  CO₂ reduction
+                  {t("roadmap.completion.co2Reduction")}
                 </p>
-                <p className="mt-1 font-bold">
-                  32%
-                </p>
+                <p className="mt-1 font-bold">32%</p>
               </div>
 
               <div>
                 <TrendingUp className="h-4 w-4 text-violet-400" />
                 <p className="mt-2 text-xs text-slate-400">
-                  Annual saving
+                  {t("roadmap.completion.annualSaving")}
                 </p>
-                <p className="mt-1 font-bold">
-                  €890
-                </p>
+                <p className="mt-1 font-bold">€890</p>
               </div>
             </div>
           </div>
         </motion.div>
+
       </div>
     </section>
   );

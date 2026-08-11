@@ -6,85 +6,86 @@ import {
   Store,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const products = [
-  {
-    name: "Roof insulation",
-    category: "Insulation",
-    performance: "High",
-    price: "From €18 / m²",
-    detail: "Reduce heat loss through the roof.",
-    tag: "Popular",
-  },
-  {
-    name: "HR++ glazing",
-    category: "Windows",
-    performance: "High",
-    price: "From €140 / m²",
-    detail: "Improve insulation and indoor comfort.",
-    tag: null,
-  },
-  {
-    name: "Hybrid heat pump",
-    category: "Heating",
-    performance: "Very high",
-    price: "From €4,500",
-    detail: "Reduce gas use with your existing boiler.",
-    tag: "Energy upgrade",
-  },
-];
-
-const offers = [
-  {
-    store: "Hornbach",
-    price: "€17.95 / m²",
-    stock: "In stock",
-    best: true,
-  },
-  {
-    store: "GAMMA",
-    price: "€19.20 / m²",
-    stock: "In stock",
-    best: false,
-  },
-  {
-    store: "Praxis",
-    price: "€20.10 / m²",
-    stock: "Low stock",
-    best: false,
-  },
-  {
-    store: "Karwei",
-    price: "€19.65 / m²",
-    stock: "In stock",
-    best: false,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export default function ProductComparison() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const products = [
+    {
+      name: t("productComparison.roofInsulation"),
+      category: t("productComparison.insulation"),
+      performance: t("productComparison.high"),
+      price: t("productComparison.roofPrice"),
+      detail: t("productComparison.roofDetail"),
+      tag: t("productComparison.popular"),
+    },
+    {
+      name: t("productComparison.glazing"),
+      category: t("productComparison.windows"),
+      performance: t("productComparison.high"),
+      price: t("productComparison.glazingPrice"),
+      detail: t("productComparison.glazingDetail"),
+      tag: null,
+    },
+    {
+      name: t("productComparison.heatPump"),
+      category: t("productComparison.heating"),
+      performance: t("productComparison.veryHigh"),
+      price: t("productComparison.heatPumpPrice"),
+      detail: t("productComparison.heatPumpDetail"),
+      tag: t("productComparison.energyUpgrade"),
+    },
+  ];
+
+  const offers = [
+    {
+      store: "Hornbach",
+      price: "€17.95 / m²",
+      stock: t("productComparison.inStock"),
+      best: true,
+    },
+    {
+      store: "GAMMA",
+      price: "€19.20 / m²",
+      stock: t("productComparison.inStock"),
+      best: false,
+    },
+    {
+      store: "Praxis",
+      price: "€20.10 / m²",
+      stock: t("productComparison.lowStock"),
+      best: false,
+    },
+    {
+      store: "Karwei",
+      price: "€19.65 / m²",
+      stock: t("productComparison.inStock"),
+      best: false,
+    },
+  ];
 
   return (
-    <section className="border-t border-slate-200 bg-slate-50/50">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+    <section className="bg-white py-20">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
 
         {/* Heading */}
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#a90f35]">
               <GitCompareArrows className="h-4 w-4" />
-              Product comparison
+              {t("productComparison.label")}
             </div>
 
             <h2 className="mt-4 text-4xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-[46px]">
-              Compare products.
+              {t("productComparison.titleLine1")}
               <br />
-              Find the best offer.
+              {t("productComparison.titleLine2")}
             </h2>
 
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600">
-              Compare renovation products, technical information and retailer
-              prices before you decide what to buy.
+              {t("productComparison.description")}
             </p>
           </div>
 
@@ -93,7 +94,7 @@ export default function ProductComparison() {
             onClick={() => navigate("/products")}
             className="group inline-flex items-center text-sm font-medium text-slate-700 transition hover:text-[#a90f35]"
           >
-            Browse all products
+            {t("productComparison.browseAll")}
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
@@ -104,7 +105,7 @@ export default function ProductComparison() {
 
           <input
             type="text"
-            placeholder="Search insulation, windows, heating..."
+            placeholder={t("productComparison.searchPlaceholder")}
             className="h-11 w-full rounded-lg border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
           />
         </div>
@@ -142,7 +143,9 @@ export default function ProductComparison() {
 
               <div className="mt-5 border-t border-slate-100 pt-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Energy impact</span>
+                  <span className="text-slate-500">
+                    {t("productComparison.energyImpact")}
+                  </span>
 
                   <span className="flex items-center gap-1.5 font-medium text-emerald-700">
                     <Check className="h-4 w-4" />
@@ -152,14 +155,17 @@ export default function ProductComparison() {
 
                 <div className="mt-4 flex items-end justify-between">
                   <div>
-                    <p className="text-xs text-slate-400">Indicative price</p>
+                    <p className="text-xs text-slate-400">
+                      {t("productComparison.indicativePrice")}
+                    </p>
+
                     <p className="mt-1 font-semibold text-slate-950">
                       {product.price}
                     </p>
                   </div>
 
                   <span className="inline-flex items-center text-sm font-medium text-slate-700 group-hover:text-[#a90f35]">
-                    Compare
+                    {t("productComparison.compare")}
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </span>
                 </div>
@@ -175,18 +181,17 @@ export default function ProductComparison() {
           <div className="max-w-md">
             <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#a90f35]">
               <Store className="h-4 w-4" />
-              Retailer prices
+              {t("productComparison.retailerPrices")}
             </div>
 
             <h3 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950">
-              One product.
+              {t("productComparison.retailerTitleLine1")}
               <br />
-              Different prices.
+              {t("productComparison.retailerTitleLine2")}
             </h3>
 
             <p className="mt-4 text-base leading-7 text-slate-600">
-              See where a product is available and compare retailer prices
-              before continuing to the store.
+              {t("productComparison.retailerDescription")}
             </p>
 
             <button
@@ -194,7 +199,7 @@ export default function ProductComparison() {
               onClick={() => navigate("/products")}
               className="group mt-6 inline-flex items-center text-sm font-semibold text-slate-900 transition hover:text-[#a90f35]"
             >
-              Explore products
+              {t("productComparison.exploreProducts")}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
@@ -203,11 +208,11 @@ export default function ProductComparison() {
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="border-b border-slate-100 px-6 py-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
-                Example comparison
+                {t("productComparison.exampleComparison")}
               </p>
 
               <p className="mt-1 font-semibold text-slate-950">
-                Roof insulation
+                {t("productComparison.roofInsulation")}
               </p>
             </div>
 
@@ -224,7 +229,7 @@ export default function ProductComparison() {
 
                     {offer.best && (
                       <span className="text-xs font-medium text-emerald-700">
-                        Best price
+                        {t("productComparison.bestPrice")}
                       </span>
                     )}
                   </div>
@@ -242,12 +247,12 @@ export default function ProductComparison() {
 
             <div className="border-t border-slate-100 bg-slate-50 px-6 py-3">
               <p className="text-xs text-slate-400">
-                Example view. Live offers are loaded from the Bouwiser product
-                database.
+                {t("productComparison.exampleNote")}
               </p>
             </div>
           </div>
         </div>
+
       </div>
     </section>
   );

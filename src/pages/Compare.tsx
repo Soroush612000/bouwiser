@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   Check,
@@ -68,8 +69,8 @@ type Product = {
 
 const COMPARE_STORAGE_KEY = "bouwiser_compare_products";
 
-function formatEuro(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
+function formatEuro(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,
@@ -111,6 +112,23 @@ function readCompareIds() {
 
 export default function Compare() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const numberLocale =
+    i18n.language?.startsWith("en") ? "en-NL" : "nl-NL";
+
+  const taxonomyLabel = (
+    slug: string | null | undefined,
+    fallback: string | null | undefined,
+  ) => {
+    if (!slug) {
+      return fallback ?? "";
+    }
+
+    return t(`taxonomy.${slug}`, {
+      defaultValue: fallback ?? slug,
+    });
+  };
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,9 +212,7 @@ export default function Compare() {
           error,
         );
 
-        setLoadError(
-          "We could not load the selected products.",
-        );
+        setLoadError("comparePage.loadErrorMessage");
 
         setLoading(false);
         return;
@@ -323,7 +339,7 @@ export default function Compare() {
                 strokeWidth={1.8}
               />
 
-              Back to products
+              {t("comparePage.backToProducts")}
             </button>
 
             <div className="mt-7 max-w-3xl">
@@ -333,19 +349,17 @@ export default function Compare() {
                   strokeWidth={1.8}
                 />
 
-                Product comparison
+                {t("comparePage.eyebrow")}
               </div>
 
               <h1 className="mt-4 text-4xl font-semibold leading-[1.08] tracking-[-0.04em] text-slate-950 sm:text-[46px]">
-                Compare products
+                {t("comparePage.titleLine1")}
                 <br className="hidden sm:block" />
-                side by side.
+                {t("comparePage.titleLine2")}
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                Compare prices, specifications and
-                retailer options to understand the
-                differences before you choose.
+                {t("comparePage.description")}
               </p>
             </div>
           </div>
@@ -364,7 +378,7 @@ export default function Compare() {
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900" />
 
               <p className="mt-4 text-sm text-slate-500">
-                Loading comparison...
+                {t("comparePage.loading")}
               </p>
             </div>
           )}
@@ -374,11 +388,11 @@ export default function Compare() {
           {!loading && loadError && (
             <div className="rounded-xl border border-red-200 bg-red-50 p-6">
               <p className="font-semibold text-red-900">
-                Comparison could not be loaded
+                {t("comparePage.loadErrorTitle")}
               </p>
 
               <p className="mt-2 text-sm text-red-700">
-                {loadError}
+                {t(loadError)}
               </p>
             </div>
           )}
@@ -397,13 +411,11 @@ export default function Compare() {
                 </div>
 
                 <h2 className="mt-5 text-xl font-semibold text-slate-950">
-                  No products selected
+                  {t("comparePage.noProductsSelected")}
                 </h2>
 
                 <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-                  Select two to four products from the
-                  marketplace to compare their prices and
-                  specifications.
+                  {t("comparePage.noProductsDescription")}
                 </p>
 
                 <button
@@ -413,7 +425,7 @@ export default function Compare() {
                   }
                   className="mt-6 h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-[#a90f35]"
                 >
-                  Browse products
+                  {t("comparePage.browseProducts")}
                 </button>
               </div>
             )}
@@ -431,15 +443,13 @@ export default function Compare() {
                 <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">
-                      {products.length}{" "}
-                      {products.length === 1
-                        ? "product"
-                        : "products"}{" "}
-                      selected
+                      {t("comparePage.selectedCount", {
+                        count: products.length,
+                      })}
                     </p>
 
                     <p className="mt-1 text-xs text-slate-400">
-                      You can compare up to four products.
+                      {t("comparePage.maxFour")}
                     </p>
                   </div>
 
@@ -451,7 +461,7 @@ export default function Compare() {
                       }
                       className="text-sm font-medium text-slate-500 transition hover:text-slate-950"
                     >
-                      Add product
+                      {t("comparePage.addProduct")}
                     </button>
 
                     <button
@@ -459,7 +469,7 @@ export default function Compare() {
                       onClick={clearComparison}
                       className="text-sm font-medium text-slate-400 transition hover:text-red-600"
                     >
-                      Clear comparison
+                      {t("comparePage.clearComparison")}
                     </button>
                   </div>
                 </div>
@@ -474,8 +484,7 @@ export default function Compare() {
                     />
 
                     <p className="text-sm leading-6 text-amber-900">
-                      Select at least one more product to
-                      make a useful comparison.
+                      {t("comparePage.selectOneMore")}
                     </p>
                   </div>
                 )}
@@ -494,7 +503,7 @@ export default function Compare() {
                         <tr>
                           <th className="w-48 border-b border-r border-slate-200 bg-slate-50 px-5 py-5 text-left align-bottom">
                             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
-                              Comparison
+                              {t("comparePage.comparison")}
                             </span>
                           </th>
 
@@ -507,13 +516,17 @@ export default function Compare() {
                                 <div className="flex items-start justify-between gap-4">
                                   <div className="min-w-0">
                                     <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a90f35]">
-                                      {product
-                                        .product_subcategories
-                                        ?.name ??
-                                        product
-                                          .product_categories
-                                          ?.name ??
-                                        "Product"}
+                                      {product.product_subcategories
+                                        ? taxonomyLabel(
+                                            product.product_subcategories.slug,
+                                            product.product_subcategories.name,
+                                          )
+                                        : product.product_categories
+                                          ? taxonomyLabel(
+                                              product.product_categories.slug,
+                                              product.product_categories.name,
+                                            )
+                                          : t("comparePage.product")}
                                     </p>
 
                                     <h2 className="mt-2 text-base font-semibold leading-6 text-slate-950">
@@ -522,7 +535,7 @@ export default function Compare() {
 
                                     <p className="mt-1 text-sm font-normal text-slate-400">
                                       {product.brand ||
-                                        "Brand not specified"}
+                                        t("comparePage.brandNotSpecified")}
                                     </p>
                                   </div>
 
@@ -534,7 +547,7 @@ export default function Compare() {
                                       )
                                     }
                                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-300 transition hover:bg-red-50 hover:text-red-600"
-                                    aria-label="Remove product from comparison"
+                                    aria-label={t("comparePage.removeProduct")}
                                   >
                                     <Trash2
                                       className="h-4 w-4"
@@ -555,7 +568,7 @@ export default function Compare() {
 
                         <tr>
                           <td className="border-b border-r border-slate-200 bg-slate-50 px-5 py-5 text-sm font-medium text-slate-600">
-                            Best price
+                            {t("comparePage.bestPrice")}
                           </td>
 
                           {products.map(
@@ -591,6 +604,7 @@ export default function Compare() {
                                         <span className="text-xl font-semibold tracking-[-0.02em] text-slate-950">
                                           {formatEuro(
                                             comparablePrice!,
+                                            numberLocale,
                                           )}
                                         </span>
 
@@ -599,7 +613,7 @@ export default function Compare() {
                                             1 && (
                                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
                                               <Check className="h-3 w-3" />
-                                              Lowest
+                                              {t("comparePage.lowest")}
                                             </span>
                                           )}
                                       </div>
@@ -607,13 +621,14 @@ export default function Compare() {
                                       {offer.price_per_unit &&
                                         offer.price_unit && (
                                           <p className="mt-1 text-xs text-slate-400">
-                                            per{" "}
+                                            {t("comparePage.per")}{" "}
                                             {
                                               offer.price_unit
                                             }{" "}
-                                            · package{" "}
+                                            · {t("comparePage.package")}{" "}
                                             {formatEuro(
                                               offer.price,
+                                              numberLocale,
                                             )}
                                           </p>
                                         )}
@@ -621,12 +636,12 @@ export default function Compare() {
                                       <p className="mt-2 text-xs font-medium text-slate-500">
                                         {offer.stores
                                           ?.name ??
-                                          "Retailer"}
+                                          t("comparePage.retailer")}
                                       </p>
                                     </>
                                   ) : (
                                     <span className="text-sm text-slate-400">
-                                      No offer
+                                      {t("comparePage.noOffer")}
                                     </span>
                                   )}
                                 </td>
@@ -641,7 +656,7 @@ export default function Compare() {
 
                         <tr>
                           <td className="border-b border-r border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-600">
-                            Rating
+                            {t("comparePage.rating")}
                           </td>
 
                           {products.map(
@@ -670,7 +685,7 @@ export default function Compare() {
                                   </div>
                                 ) : (
                                   <span className="text-sm text-slate-400">
-                                    Not available
+                                    {t("comparePage.notAvailable")}
                                   </span>
                                 )}
                               </td>
@@ -684,7 +699,7 @@ export default function Compare() {
 
                         <tr>
                           <td className="border-b border-r border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-600">
-                            Material
+                            {t("comparePage.material")}
                           </td>
 
                           {products.map(
@@ -694,7 +709,7 @@ export default function Compare() {
                                 className="border-b border-r border-slate-200 px-5 py-4 text-sm text-slate-700 last:border-r-0"
                               >
                                 {product.material ||
-                                  "Not specified"}
+                                  t("comparePage.notSpecified")}
                               </td>
                             ),
                           )}
@@ -706,7 +721,7 @@ export default function Compare() {
 
                         <tr>
                           <td className="border-b border-r border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-600">
-                            Colour
+                            {t("comparePage.colour")}
                           </td>
 
                           {products.map(
@@ -716,7 +731,7 @@ export default function Compare() {
                                 className="border-b border-r border-slate-200 px-5 py-4 text-sm text-slate-700 last:border-r-0"
                               >
                                 {product.color ||
-                                  "Not specified"}
+                                  t("comparePage.notSpecified")}
                               </td>
                             ),
                           )}
@@ -782,7 +797,7 @@ export default function Compare() {
 
                         <tr>
                           <td className="border-r border-slate-200 bg-slate-50 px-5 py-5 text-sm font-medium text-slate-600">
-                            Retailer
+                            {t("comparePage.retailer")}
                           </td>
 
                           {products.map(
@@ -804,16 +819,16 @@ export default function Compare() {
                                       rel="noreferrer"
                                       className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 text-xs font-semibold text-white transition hover:bg-[#a90f35]"
                                     >
-                                      Visit{" "}
+                                      {t("comparePage.visit")}{" "}
                                       {offer.stores
                                         ?.name ??
-                                        "store"}
+                                        t("comparePage.store")}
 
                                       <ExternalLink className="h-3.5 w-3.5" />
                                     </a>
                                   ) : (
                                     <span className="text-sm text-slate-400">
-                                      No current offer
+                                      {t("comparePage.noCurrentOffer")}
                                     </span>
                                   )}
                                 </td>
@@ -838,17 +853,11 @@ export default function Compare() {
 
                   <div>
                     <p className="text-sm font-medium text-slate-700">
-                      About this comparison
+                      {t("comparePage.aboutTitle")}
                     </p>
 
                     <p className="mt-1 max-w-4xl text-xs leading-5 text-slate-500">
-                      Bouwiser compares the product
-                      information currently available in
-                      the marketplace database. Retail
-                      prices and availability can change,
-                      so confirm the final information on
-                      the retailer website before
-                      purchasing.
+                      {t("comparePage.aboutDescription")}
                     </p>
                   </div>
                 </div>

@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import MyProjects from "./pages/MyProjects";
 import ProjectDetails from "./pages/ProjectDetails";
-import AIScan from "./pages/AIScan";
+import AIScan from "./pages/AIScan.tsx";
 import Energy from "./pages/Energy";
 import AIAssistant from "./pages/AIAssistant";
 import Products from "./pages/Products";

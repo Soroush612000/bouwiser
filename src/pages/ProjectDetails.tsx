@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 import DashboardSidebar from "../components/DashboardSidebar";
@@ -42,6 +43,8 @@ type SupabaseProject = {
   progress: number | null;
   next_action: string | null;
   roi: string | null;
+  street_address: string | null;
+  photo_categories: unknown;
 };
 
 function formatEuro(value: number | null | undefined) {
@@ -80,12 +83,12 @@ function mapSupabaseProject(
     name: row.project_name?.trim() || "My Renovation Project",
     propertyType: row.property_type?.trim() || "Home",
     city: row.city?.trim() || "Unknown city",
-    address: row.city?.trim() || "Unknown city",
+    address: row.street_address?.trim() || row.city?.trim() || "Unknown address",
     yearBuilt: row.construction_year ?? 0,
     floorArea: Number(row.floor_area) || 0,
     currentEnergyLabel: row.current_energy_label?.trim() || "?",
-    targetEnergyLabel: row.target_energy_label?.trim() || "B",
-    status: row.status?.trim() || "AI analysis completed",
+    targetEnergyLabel: row.target_energy_label?.trim() || "?",
+    status: row.status?.trim() || "AI analysis pending",
     progress: row.progress ?? 0,
     budget,
     annualSaving,
@@ -101,8 +104,56 @@ function mapSupabaseProject(
   };
 }
 
+
+type StoredProjectPhoto = {
+  category: string;
+  path: string;
+  fileName: string;
+};
+
+type ProjectPhoto = StoredProjectPhoto & {
+  signedUrl: string;
+};
+
+function parseProjectPhotos(value: unknown): StoredProjectPhoto[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item): StoredProjectPhoto | null => {
+      if (
+        item &&
+        typeof item === "object" &&
+        "category" in item &&
+        "path" in item
+      ) {
+        const photo = item as {
+          category?: unknown;
+          path?: unknown;
+          fileName?: unknown;
+        };
+
+        if (
+          typeof photo.category === "string" &&
+          typeof photo.path === "string" &&
+          photo.path
+        ) {
+          return {
+            category: photo.category,
+            path: photo.path,
+            fileName:
+              typeof photo.fileName === "string" ? photo.fileName : "Photo",
+          };
+        }
+      }
+
+      return null;
+    })
+    .filter((photo): photo is StoredProjectPhoto => photo !== null);
+}
+
 export default function ProjectDetails() {
   const { id } = useParams();
+  const { t } = useTranslation();
 
   const [activeMenu, setActiveMenu] = useState("projects");
   const [activeTab, setActiveTab] = useState("Overview");
@@ -111,6 +162,8 @@ export default function ProjectDetails() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [loadError, setLoadError] = useState("");
+  const [projectPhotos, setProjectPhotos] = useState<ProjectPhoto[]>([]);
+  const [photoLoadError, setPhotoLoadError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -134,7 +187,7 @@ export default function ProjectDetails() {
 
       if (!template) {
         if (mounted) {
-          setLoadError("Project template is unavailable.");
+          setLoadError(t("projectDetails.errors.templateUnavailable"));
           setLoading(false);
         }
         return;
@@ -148,7 +201,7 @@ export default function ProjectDetails() {
       if (!mounted) return;
 
       if (userError || !user) {
-        setLoadError("You must be signed in to view this project.");
+        setLoadError(t("projectDetails.errors.signInRequired"));
         setLoading(false);
         return;
       }
@@ -164,7 +217,7 @@ export default function ProjectDetails() {
 
       if (error) {
         console.error("Could not load Bouwiser project:", error);
-        setLoadError("We could not load this project.");
+        setLoadError(t("projectDetails.errors.loadFailed"));
         setLoading(false);
         return;
       }
@@ -175,9 +228,52 @@ export default function ProjectDetails() {
         return;
       }
 
+      const row = data as SupabaseProject;
+
       setProject(
-        mapSupabaseProject(data as SupabaseProject, template),
+        mapSupabaseProject(row, template),
       );
+
+      const storedPhotos = parseProjectPhotos(row.photo_categories);
+
+      if (storedPhotos.length > 0) {
+        const signedPhotos = await Promise.all(
+          storedPhotos.map(async (photo) => {
+            const { data: signedData, error: signedError } =
+              await supabase.storage
+                .from("project-photos")
+                .createSignedUrl(photo.path, 60 * 60);
+
+            if (signedError || !signedData?.signedUrl) {
+              console.error(
+                `Could not load project photo ${photo.path}:`,
+                signedError,
+              );
+              return null;
+            }
+
+            return {
+              ...photo,
+              signedUrl: signedData.signedUrl,
+            } satisfies ProjectPhoto;
+          }),
+        );
+
+        if (mounted) {
+          setProjectPhotos(
+            signedPhotos.filter(
+              (photo): photo is ProjectPhoto => photo !== null,
+            ),
+          );
+
+          if (signedPhotos.every((photo) => photo === null)) {
+            setPhotoLoadError(t("projectDetails.errors.photosFailed"));
+          }
+        }
+      } else if (mounted) {
+        setProjectPhotos([]);
+      }
+
       setLoading(false);
     };
 
@@ -186,7 +282,7 @@ export default function ProjectDetails() {
     return () => {
       mounted = false;
     };
-  }, [id]);
+  }, [id, t]);
 
   if (notFound) {
     return <Navigate to="/projects" replace />;
@@ -206,10 +302,10 @@ export default function ProjectDetails() {
           <div className="rounded-[30px] border border-slate-200 bg-white p-10 shadow-sm">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
             <h1 className="mt-5 text-3xl font-black text-slate-950">
-              Loading project...
+              {t("projectDetails.loading.title")}
             </h1>
             <p className="mt-2 text-slate-500">
-              Retrieving your renovation project from Bouwiser.
+              {t("projectDetails.loading.description")}
             </p>
           </div>
         </div>
@@ -230,10 +326,10 @@ export default function ProjectDetails() {
         <div className="mx-auto max-w-7xl">
           <div className="rounded-[30px] border border-red-200 bg-red-50 p-10">
             <h1 className="text-3xl font-black text-slate-950">
-              Unable to load project
+              {t("projectDetails.errorTitle")}
             </h1>
             <p className="mt-2 text-slate-600">
-              {loadError || "The project could not be loaded."}
+              {loadError || t("projectDetails.errors.loadFailed")}
             </p>
           </div>
         </div>
@@ -283,24 +379,24 @@ export default function ProjectDetails() {
 
               <section className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-                  AI report summary
+                  {t("projectDetails.aiReport.eyebrow")}
                 </p>
 
                 <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  Renovation analysis
+                  {t("projectDetails.aiReport.title")}
                 </h2>
 
                 <p className="mt-3 text-sm leading-6 text-slate-500">
-                  The property can improve from energy label{" "}
-                  {project.currentEnergyLabel} to{" "}
-                  {project.targetEnergyLabel} by completing the recommended
-                  renovation measures.
+                  {t("projectDetails.aiReport.description", {
+                    current: project.currentEnergyLabel,
+                    target: project.targetEnergyLabel,
+                  })}
                 </p>
 
                 <div className="mt-7 grid gap-4 sm:grid-cols-2">
                   <article className="rounded-2xl bg-orange-50 p-5">
                     <p className="text-sm font-semibold text-orange-700">
-                      Current energy label
+                      {t("projectDetails.aiReport.currentLabel")}
                     </p>
 
                     <p className="mt-2 text-4xl font-black text-orange-950">
@@ -310,7 +406,7 @@ export default function ProjectDetails() {
 
                   <article className="rounded-2xl bg-emerald-50 p-5">
                     <p className="text-sm font-semibold text-emerald-700">
-                      Predicted energy label
+                      {t("projectDetails.aiReport.predictedLabel")}
                     </p>
 
                     <p className="mt-2 text-4xl font-black text-emerald-950">
@@ -320,7 +416,7 @@ export default function ProjectDetails() {
 
                   <article className="rounded-2xl bg-blue-50 p-5">
                     <p className="text-sm font-semibold text-blue-700">
-                      CO₂ reduction
+                      {t("projectDetails.aiReport.co2Reduction")}
                     </p>
 
                     <p className="mt-2 text-3xl font-black text-blue-950">
@@ -330,7 +426,7 @@ export default function ProjectDetails() {
 
                   <article className="rounded-2xl bg-violet-50 p-5">
                     <p className="text-sm font-semibold text-violet-700">
-                      AI confidence
+                      {t("projectDetails.aiReport.aiConfidence")}
                     </p>
 
                     <p className="mt-2 text-3xl font-black text-violet-950">
@@ -348,60 +444,92 @@ export default function ProjectDetails() {
         {activeTab === "Photos" && (
           <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-              Project photos
+              {t("projectDetails.photos.eyebrow")}
             </p>
 
-            <h2 className="mt-3 text-3xl font-black text-slate-950">
-              Property photo gallery
-            </h2>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-slate-950">
+                  {t("projectDetails.photos.title")}
+                </h2>
 
-            <p className="mt-3 text-slate-500">
-              Upload roof, facade, window, heating-system and meter photos.
-            </p>
+                <p className="mt-3 text-slate-500">
+                  {t("projectDetails.photos.description")}
+                </p>
+              </div>
 
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {[
-                "Roof",
-                "Facade",
-                "Windows",
-                "Heating System",
-                "Energy Meter",
-                "Floor",
-              ].map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className="flex min-h-44 flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-slate-200 bg-slate-50 p-6 text-center transition hover:border-orange-300 hover:bg-orange-50"
-                >
-                  <span className="text-lg font-black text-slate-950">
-                    {category}
-                  </span>
-
-                  <span className="mt-2 text-sm text-slate-500">
-                    Upload photos
-                  </span>
-                </button>
-              ))}
+              <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600">
+                {t("projectDetails.photos.count", { count: projectPhotos.length })}
+              </div>
             </div>
+
+            {photoLoadError && (
+              <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                {photoLoadError}
+              </div>
+            )}
+
+            {projectPhotos.length > 0 ? (
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {projectPhotos.map((photo) => (
+                  <article
+                    key={`${t(`projectDetails.photoCategories.${photo.category}`, { defaultValue: photo.category })}-${photo.path}`}
+                    className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                      <img
+                        src={photo.signedUrl}
+                        alt={t(`projectDetails.photoCategories.${t(`projectDetails.photoCategories.${photo.category}`, { defaultValue: photo.category })}`, { defaultValue: photo.category })}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+
+                      <div className="absolute left-3 top-3 rounded-full bg-slate-950/75 px-3 py-1.5 text-xs font-black text-white backdrop-blur">
+                        {t(`projectDetails.photoCategories.${photo.category}`, { defaultValue: photo.category })}
+                      </div>
+                    </div>
+
+                    <div className="p-5">
+                      <p className="font-black text-slate-950">
+                        {t(`projectDetails.photoCategories.${photo.category}`, { defaultValue: photo.category })}
+                      </p>
+
+                      <p className="mt-1 truncate text-sm text-slate-500">
+                        {photo.fileName}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-[26px] border-2 border-dashed border-slate-200 bg-slate-50 p-10 text-center">
+                <p className="text-lg font-black text-slate-950">
+                  {t("projectDetails.photos.emptyTitle")}
+                </p>
+
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+                  {t("projectDetails.photos.emptyDescription")}
+                </p>
+              </div>
+            )}
           </section>
         )}
 
         {activeTab === "Documents" && (
           <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-              Project documents
+              {t("projectDetails.documents.eyebrow")}
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-slate-950">
-              Document workspace
+              {t("projectDetails.documents.title")}
             </h2>
 
             <div className="mt-8 space-y-4">
               {[
-                "Energy Label Certificate.pdf",
-                "AI Renovation Report.pdf",
-                "Existing Floor Plan.pdf",
-                "Contractor Quotation.pdf",
+                t("projectDetails.documents.files.energyLabel"),
+                t("projectDetails.documents.files.aiReport"),
+                t("projectDetails.documents.files.floorPlan"),
+                t("projectDetails.documents.files.contractorQuote"),
               ].map((document, index) => (
                 <article
                   key={document}
@@ -413,7 +541,7 @@ export default function ProjectDetails() {
                     </p>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      Updated {index + 1} day{index === 0 ? "" : "s"} ago
+                      {t("projectDetails.documents.updatedDaysAgo", { count: index + 1 })}
                     </p>
                   </div>
 
@@ -421,7 +549,7 @@ export default function ProjectDetails() {
                     type="button"
                     className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
                   >
-                    View document
+                    {t("projectDetails.documents.view")}
                   </button>
                 </article>
               ))}
@@ -432,11 +560,11 @@ export default function ProjectDetails() {
         {activeTab === "Quotes" && (
           <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-              Contractor quotes
+              {t("projectDetails.quotes.eyebrow")}
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-slate-950">
-              Compare quotations
+              {t("projectDetails.quotes.title")}
             </h2>
 
             <div className="mt-8 grid gap-5 lg:grid-cols-3">
@@ -444,17 +572,17 @@ export default function ProjectDetails() {
                 {
                   company: "GreenBuild",
                   price: "€14,850",
-                  status: "Recommended",
+                  status: t("projectDetails.quotes.status.recommended"),
                 },
                 {
                   company: "EcoRenovatie",
                   price: "€16,200",
-                  status: "Received",
+                  status: t("projectDetails.quotes.status.received"),
                 },
                 {
                   company: "HomeEnergy NL",
                   price: "€17,100",
-                  status: "Under review",
+                  status: t("projectDetails.quotes.status.underReview"),
                 },
               ].map((quote) => (
                 <article
@@ -477,7 +605,7 @@ export default function ProjectDetails() {
                     type="button"
                     className="mt-6 w-full rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-500"
                   >
-                    Review quote
+                    {t("projectDetails.quotes.review")}
                   </button>
                 </article>
               ))}
@@ -488,33 +616,33 @@ export default function ProjectDetails() {
         {activeTab === "Tasks" && (
           <section className="rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-              Project tasks
+              {t("projectDetails.tasks.eyebrow")}
             </p>
 
             <h2 className="mt-3 text-3xl font-black text-slate-950">
-              Renovation checklist
+              {t("projectDetails.tasks.title")}
             </h2>
 
             <div className="mt-8 space-y-4">
               {[
                 {
-                  title: "Upload roof photos",
+                  title: t("projectDetails.tasks.items.uploadRoofPhotos"),
                   completed: true,
                 },
                 {
-                  title: "Review AI renovation report",
+                  title: t("projectDetails.tasks.items.reviewAiReport"),
                   completed: true,
                 },
                 {
-                  title: "Compare insulation products",
+                  title: t("projectDetails.tasks.items.compareInsulation"),
                   completed: false,
                 },
                 {
-                  title: "Request contractor quotations",
+                  title: t("projectDetails.tasks.items.requestQuotes"),
                   completed: false,
                 },
                 {
-                  title: "Schedule installation",
+                  title: t("projectDetails.tasks.items.scheduleInstallation"),
                   completed: false,
                 },
               ].map((task) => (

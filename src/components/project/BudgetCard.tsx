@@ -5,6 +5,7 @@ import {
   TrendingDown,
   WalletCards,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { ProjectData } from "../../data/project";
 
@@ -16,8 +17,8 @@ function parseEuro(value: string) {
   return Number(value.replace(/[^\d]/g, "")) || 0;
 }
 
-function formatEuro(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
+function formatEuro(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -27,6 +28,20 @@ function formatEuro(value: number) {
 export default function BudgetCard({
   project,
 }: BudgetCardProps) {
+  const { t, i18n } = useTranslation();
+
+  const numberLocale =
+    i18n.language?.startsWith("en") ? "en-NL" : "nl-NL";
+
+  const translateKnownValue = (value: string) => {
+    const knownValues: Record<string, string> = {
+      "To be estimated": t("budgetCard.values.toBeEstimated"),
+      "Nog te bepalen": t("budgetCard.values.toBeEstimated"),
+    };
+
+    return knownValues[value] ?? value;
+  };
+
   const totalBudget = parseEuro(project.budget);
   const subsidy = parseEuro(project.subsidy);
   const netInvestment = Math.max(totalBudget - subsidy, 0);
@@ -38,21 +53,22 @@ export default function BudgetCard({
       <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-            Project budget
+            {t("budgetCard.eyebrow")}
           </p>
 
           <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-            Financial overview
+            {t("budgetCard.title")}
           </h2>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-            Review the planned investment, estimated subsidy, annual savings
-            and expected payback period.
+            {t("budgetCard.description")}
           </p>
         </div>
 
         <span className="w-fit rounded-full bg-emerald-100 px-4 py-2 text-xs font-bold text-emerald-700">
-          {subsidyPercentage}% subsidy coverage
+          {t("budgetCard.subsidyCoverage", {
+            percentage: subsidyPercentage,
+          })}
         </span>
       </div>
 
@@ -63,15 +79,15 @@ export default function BudgetCard({
           </div>
 
           <p className="mt-5 text-sm font-semibold text-slate-500">
-            Total budget
+            {t("budgetCard.totalBudget")}
           </p>
 
           <p className="mt-2 text-3xl font-black text-slate-950">
-            {project.budget}
+            {translateKnownValue(project.budget)}
           </p>
 
           <p className="mt-2 text-sm text-slate-500">
-            Planned renovation investment
+            {t("budgetCard.plannedInvestment")}
           </p>
         </article>
 
@@ -81,15 +97,15 @@ export default function BudgetCard({
           </div>
 
           <p className="mt-5 text-sm font-semibold text-blue-700">
-            Estimated subsidy
+            {t("budgetCard.estimatedSubsidy")}
           </p>
 
           <p className="mt-2 text-3xl font-black text-blue-950">
-            {project.subsidy}
+            {translateKnownValue(project.subsidy)}
           </p>
 
           <p className="mt-2 text-sm text-blue-700">
-            Potential government support
+            {t("budgetCard.governmentSupport")}
           </p>
         </article>
 
@@ -99,15 +115,15 @@ export default function BudgetCard({
           </div>
 
           <p className="mt-5 text-sm font-semibold text-emerald-700">
-            Annual saving
+            {t("budgetCard.annualSaving")}
           </p>
 
           <p className="mt-2 text-3xl font-black text-emerald-950">
-            {project.annualSaving}
+            {translateKnownValue(project.annualSaving)}
           </p>
 
           <p className="mt-2 text-sm text-emerald-700">
-            Expected yearly energy saving
+            {t("budgetCard.yearlyEnergySaving")}
           </p>
         </article>
 
@@ -117,15 +133,15 @@ export default function BudgetCard({
           </div>
 
           <p className="mt-5 text-sm font-semibold text-violet-700">
-            Payback period
+            {t("budgetCard.paybackPeriod")}
           </p>
 
           <p className="mt-2 text-3xl font-black text-violet-950">
-            {project.roi}
+            {translateKnownValue(project.roi)}
           </p>
 
           <p className="mt-2 text-sm text-violet-700">
-            Estimated return on investment
+            {t("budgetCard.estimatedReturn")}
           </p>
         </article>
       </div>
@@ -135,15 +151,15 @@ export default function BudgetCard({
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
             <div>
               <p className="text-sm font-semibold text-slate-400">
-                Estimated net investment
+                {t("budgetCard.netInvestment")}
               </p>
 
               <p className="mt-3 text-4xl font-black">
-                {formatEuro(netInvestment)}
+                {formatEuro(netInvestment, numberLocale)}
               </p>
 
               <p className="mt-2 text-sm text-slate-400">
-                Total budget after estimated subsidy
+                {t("budgetCard.afterSubsidy")}
               </p>
             </div>
 
@@ -155,7 +171,7 @@ export default function BudgetCard({
           <div className="mt-7">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-400">
-                Subsidy contribution
+                {t("budgetCard.subsidyContribution")}
               </span>
 
               <span className="font-black">
@@ -174,46 +190,45 @@ export default function BudgetCard({
 
         <article className="rounded-[26px] border border-slate-200 bg-slate-50 p-6">
           <p className="text-sm font-bold uppercase tracking-[0.14em] text-orange-500">
-            Financial insight
+            {t("budgetCard.insightEyebrow")}
           </p>
 
           <h3 className="mt-3 text-xl font-black text-slate-950">
-            Renovation affordability
+            {t("budgetCard.affordability")}
           </h3>
 
           <p className="mt-3 text-sm leading-6 text-slate-500">
-            The current renovation plan combines subsidy support and expected
-            yearly savings to reduce the effective investment.
+            {t("budgetCard.insightDescription")}
           </p>
 
           <div className="mt-6 space-y-4">
             <div className="flex items-center justify-between rounded-2xl bg-white p-4">
               <span className="text-sm font-semibold text-slate-500">
-                Gross investment
+                {t("budgetCard.grossInvestment")}
               </span>
 
               <span className="font-black text-slate-950">
-                {project.budget}
+                {translateKnownValue(project.budget)}
               </span>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-white p-4">
               <span className="text-sm font-semibold text-slate-500">
-                Subsidy reduction
+                {t("budgetCard.subsidyReduction")}
               </span>
 
               <span className="font-black text-emerald-600">
-                − {project.subsidy}
+                − {translateKnownValue(project.subsidy)}
               </span>
             </div>
 
             <div className="flex items-center justify-between rounded-2xl bg-orange-50 p-4">
               <span className="text-sm font-semibold text-orange-700">
-                Net investment
+                {t("budgetCard.netInvestment")}
               </span>
 
               <span className="font-black text-orange-950">
-                {formatEuro(netInvestment)}
+                {formatEuro(netInvestment, numberLocale)}
               </span>
             </div>
           </div>

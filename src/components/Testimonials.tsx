@@ -11,70 +11,66 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
-const examples = [
-  {
-    icon: Home,
-    category: "Energy performance",
-    title: "Improve the energy performance of your home",
-    description:
-      "Explore how insulation, glazing and heating upgrades could improve your home's overall energy performance.",
-    insight: "Energy label improvement",
-    value: "D → B",
-  },
-  {
-    icon: Euro,
-    category: "Costs & savings",
-    title: "Understand the financial impact",
-    description:
-      "Compare indicative investment costs, available subsidies and potential energy savings before making a decision.",
-    insight: "Potential yearly saving",
-    value: "€890",
-  },
-  {
-    icon: Leaf,
-    category: "Sustainability",
-    title: "Explore your renovation impact",
-    description:
-      "See how different renovation measures could reduce energy use and improve the environmental performance of your home.",
-    insight: "Potential CO₂ reduction",
-    value: "32%",
-  },
-];
-
-const capabilities = [
-  {
-    icon: BarChart3,
-    title: "Energy insights",
-    text: "Understand where your home could perform better.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Prioritised improvements",
-    text: "Identify renovation measures worth considering first.",
-  },
-  {
-    icon: Euro,
-    title: "Cost indications",
-    text: "Review indicative costs, savings and subsidy opportunities.",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Clear next steps",
-    text: "Turn renovation insights into a structured plan.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export default function Testimonials() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const examples = [
+    {
+      icon: Home,
+      category: t("testimonials.examples.energy.category"),
+      title: t("testimonials.examples.energy.title"),
+      description: t("testimonials.examples.energy.description"),
+      insight: t("testimonials.examples.energy.insight"),
+      value: "D → B",
+    },
+    {
+      icon: Euro,
+      category: t("testimonials.examples.costs.category"),
+      title: t("testimonials.examples.costs.title"),
+      description: t("testimonials.examples.costs.description"),
+      insight: t("testimonials.examples.costs.insight"),
+      value: "€890",
+    },
+    {
+      icon: Leaf,
+      category: t("testimonials.examples.sustainability.category"),
+      title: t("testimonials.examples.sustainability.title"),
+      description: t("testimonials.examples.sustainability.description"),
+      insight: t("testimonials.examples.sustainability.insight"),
+      value: "32%",
+    },
+  ];
+
+  const capabilities = [
+    {
+      icon: BarChart3,
+      title: t("testimonials.capabilities.energy.title"),
+      text: t("testimonials.capabilities.energy.text"),
+    },
+    {
+      icon: Lightbulb,
+      title: t("testimonials.capabilities.priorities.title"),
+      text: t("testimonials.capabilities.priorities.text"),
+    },
+    {
+      icon: Euro,
+      title: t("testimonials.capabilities.costs.title"),
+      text: t("testimonials.capabilities.costs.text"),
+    },
+    {
+      icon: CheckCircle2,
+      title: t("testimonials.capabilities.nextSteps.title"),
+      text: t("testimonials.capabilities.nextSteps.text"),
+    },
+  ];
 
   return (
-    <section className="relative overflow-hidden bg-white py-24">
+    <section className="relative overflow-hidden bg-slate-50 py-20 sm:py-24">
       {/* Background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-40 top-10 h-96 w-96 rounded-full bg-orange-100/60 blur-3xl" />
-        <div className="absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-emerald-100/50 blur-3xl" />
-
+      <div className="absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -96,19 +92,18 @@ export default function Testimonials() {
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-700">
             <Sparkles className="h-4 w-4" />
-            Renovation insights
+            {t("testimonials.label")}
           </div>
 
           <h2 className="mt-6 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl lg:text-6xl">
-            Understand the impact
+            {t("testimonials.titleLine1")}
             <span className="block text-orange-500">
-              before you renovate.
+              {t("testimonials.titleLine2")}
             </span>
           </h2>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            Bouwiser helps you explore renovation opportunities, compare
-            potential outcomes and make more informed decisions for your home.
+            {t("testimonials.description")}
           </p>
         </motion.div>
 
@@ -130,14 +125,13 @@ export default function Testimonials() {
                 whileHover={{ y: -6 }}
                 className="group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_20px_60px_rgba(15,23,42,0.06)] transition-all duration-300 hover:border-orange-200 hover:shadow-[0_28px_80px_rgba(15,23,42,0.10)]"
               >
-                {/* Top */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 transition-colors group-hover:bg-orange-500 group-hover:text-white">
                     <Icon className="h-6 w-6" />
                   </div>
 
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-                    Illustrative example
+                    {t("testimonials.illustrativeExample")}
                   </span>
                 </div>
 
@@ -153,7 +147,6 @@ export default function Testimonials() {
                   {example.description}
                 </p>
 
-                {/* Example result */}
                 <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 p-5">
                   <p className="text-sm text-slate-500">
                     {example.insight}
@@ -164,8 +157,7 @@ export default function Testimonials() {
                   </p>
 
                   <p className="mt-2 text-xs leading-5 text-slate-400">
-                    Example only. Actual results depend on your property,
-                    renovation measures and available data.
+                    {t("testimonials.exampleDisclaimer")}
                   </p>
                 </div>
               </motion.article>
@@ -183,7 +175,7 @@ export default function Testimonials() {
         >
           <div className="mb-7">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-orange-400">
-              What Bouwiser helps you evaluate
+              {t("testimonials.capabilitiesLabel")}
             </p>
           </div>
 
@@ -229,13 +221,11 @@ export default function Testimonials() {
 
               <div>
                 <h3 className="text-2xl font-black text-slate-950">
-                  Ready to explore your home?
+                  {t("testimonials.ctaTitle")}
                 </h3>
 
                 <p className="mt-2 max-w-2xl leading-7 text-slate-600">
-                  Start with the Bouwiser AI Home Scan to identify potential
-                  renovation opportunities and create a clearer starting point
-                  for your renovation journey.
+                  {t("testimonials.ctaDescription")}
                 </p>
               </div>
             </div>
@@ -245,7 +235,7 @@ export default function Testimonials() {
               onClick={() => navigate("/ai-scan")}
               className="group inline-flex h-12 items-center justify-center rounded-xl bg-orange-500 px-6 font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
             >
-              Start AI Home Scan
+              {t("testimonials.startScan")}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>

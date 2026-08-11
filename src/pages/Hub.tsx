@@ -1,18 +1,223 @@
-import { Building2, Handshake, PackageSearch, Star } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  Factory,
+  Handshake,
+  Network,
+  PackageSearch,
+  Store,
+  Users,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 
-const suppliers = [
-  { name: "Example Insulation Partner", specialty: "Insulation", rating: "4.7", products: "42 products" },
-  { name: "Example Sustainable Build", specialty: "Eco materials", rating: "4.8", products: "31 products" },
-  { name: "Example Energy Solutions", specialty: "Heat pumps & solar", rating: "4.6", products: "28 products" },
+const partnerTypes = [
+  {
+    title: "Manufacturers",
+    description:
+      "Present building products with clear specifications, performance information and relevant renovation applications.",
+    icon: Factory,
+  },
+  {
+    title: "Suppliers",
+    description:
+      "Help homeowners discover available products and compare suitable options in one structured environment.",
+    icon: Store,
+  },
+  {
+    title: "Renovation professionals",
+    description:
+      "Connect renovation expertise with homeowners who are actively planning improvements to their properties.",
+    icon: Users,
+  },
+];
+
+const benefits = [
+  {
+    title: "Product visibility",
+    description:
+      "Make products easier to discover within relevant renovation categories and homeowner journeys.",
+    icon: PackageSearch,
+  },
+  {
+    title: "Structured comparison",
+    description:
+      "Present product information in a consistent format that helps homeowners understand and compare options.",
+    icon: Network,
+  },
+  {
+    title: "Relevant homeowner connections",
+    description:
+      "Reach homeowners at the moment they are exploring renovation measures, products and next steps.",
+    icon: Handshake,
+  },
 ];
 
 export default function Hub() {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950"><Navbar /><main className="px-6 py-16 lg:px-10"><div className="mx-auto max-w-7xl">
-      <div className="max-w-3xl"><div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700"><Handshake className="h-4 w-4" /> Supplier & partner hub</div><h1 className="mt-6 text-5xl font-black tracking-tight">Transparent access to suppliers and renovation partners</h1><p className="mt-5 text-lg leading-8 text-slate-600">Bouwiser is building a structured network of manufacturers, suppliers and renovation professionals to make product information easier to compare.</p></div>
-      <div className="mt-12 grid gap-6 lg:grid-cols-3">{suppliers.map((supplier) => (<article key={supplier.name} className="rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><Building2 className="h-6 w-6" /></div><h2 className="mt-5 text-xl font-black">{supplier.name}</h2><p className="mt-2 text-sm text-slate-500">{supplier.specialty}</p><div className="mt-6 flex items-center justify-between rounded-2xl bg-slate-50 p-4"><span className="flex items-center gap-2 text-sm font-bold"><Star className="h-4 w-4 text-orange-500" />{supplier.rating}</span><span className="text-sm text-slate-500">{supplier.products}</span></div></article>))}</div>
-      <div className="mt-10 rounded-[32px] bg-slate-950 p-8 text-white"><PackageSearch className="h-8 w-8 text-orange-400" /><h2 className="mt-5 text-3xl font-black">Partner onboarding is in development</h2><p className="mt-3 max-w-2xl leading-7 text-slate-400">Future versions will support structured supplier profiles, verified product data, customer reviews and partner collaboration.</p></div>
-    </div></main></div>
+    <div className="min-h-screen bg-white text-slate-950">
+      <Navbar />
+
+      <main>
+        {/* Hero */}
+        <section className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#a90f35]">
+                <Handshake className="h-4 w-4" strokeWidth={1.8} />
+                Supplier & partner network
+              </div>
+
+              <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-0.045em] text-slate-950 sm:text-6xl">
+                Connect renovation products
+                <br />
+                with homeowners.
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+                Bouwiser brings manufacturers, suppliers and renovation
+                professionals into one structured environment where homeowners
+                can explore products, understand options and plan their next
+                renovation steps.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Partner types */}
+        <section className="border-b border-slate-200 bg-slate-50/60">
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a90f35]">
+                Partner network
+              </p>
+
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-4xl">
+                Built for the renovation ecosystem.
+              </h2>
+
+              <p className="mt-4 text-base leading-7 text-slate-600">
+                Bouwiser is designed to connect the different parties involved
+                in residential renovation through clearer information and a
+                more structured homeowner journey.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {partnerTypes.map((partner) => {
+                const Icon = partner.icon;
+
+                return (
+                  <article
+                    key={partner.title}
+                    className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-lg"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                      <Icon className="h-5 w-5" strokeWidth={1.8} />
+                    </div>
+
+                    <h3 className="mt-6 text-xl font-semibold text-slate-950">
+                      {partner.title}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      {partner.description}
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Value for partners */}
+        <section className="bg-white">
+          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+              <div>
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <Building2 className="h-5 w-5" strokeWidth={1.8} />
+                </div>
+
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#a90f35]">
+                  Why partner with Bouwiser?
+                </p>
+
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-4xl">
+                  A clearer route from product information to renovation
+                  decisions.
+                </h2>
+
+                <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
+                  Bouwiser aims to make renovation information more useful for
+                  homeowners while giving industry partners a structured way to
+                  present relevant products and expertise.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                {benefits.map((benefit) => {
+                  const Icon = benefit.icon;
+
+                  return (
+                    <article
+                      key={benefit.title}
+                      className="flex gap-5 rounded-2xl border border-slate-200 bg-white p-6"
+                    >
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                        <Icon className="h-5 w-5" strokeWidth={1.8} />
+                      </div>
+
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-950">
+                          {benefit.title}
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-slate-600">
+                          {benefit.description}
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="mt-16 overflow-hidden rounded-3xl bg-slate-950 px-7 py-8 text-white sm:px-9 sm:py-9">
+              <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-2xl">
+                  <p className="text-sm font-medium text-orange-300">
+                    Join the Bouwiser network
+                  </p>
+
+                  <h2 className="mt-2 text-2xl font-semibold tracking-[-0.025em] sm:text-3xl">
+                    Interested in becoming a Bouwiser partner?
+                  </h2>
+
+                  <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
+                    Manufacturers, suppliers and renovation professionals can
+                    contact Bouwiser to discuss product visibility,
+                    collaboration and participation in the platform.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/contact")}
+                  className="group inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+                >
+                  Contact Bouwiser
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

@@ -7,48 +7,48 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function AISection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
-          
+        <div className="grid items-center gap-14 lg:grid-cols-2">
+
           {/* Left */}
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-orange-600">
               <Sparkles className="h-4 w-4" />
-              AI Home Scan
+              {t("aiSection.label")}
             </div>
 
             <h2 className="mt-5 text-4xl font-extrabold tracking-[-0.035em] text-slate-950 sm:text-5xl">
-              See what your home
+              {t("aiSection.titleLine1")}
               <br />
-              could improve.
+              {t("aiSection.titleLine2")}
             </h2>
 
             <p className="mt-6 text-lg leading-8 text-slate-600">
-              Add a few photos and basic information about your home.
-              Bouwiser helps identify renovation opportunities and gives
-              you a personalised starting point.
+              {t("aiSection.description")}
             </p>
 
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
                 <BarChart3 className="h-5 w-5 text-orange-500" />
-                Energy and performance insights
+                {t("aiSection.insight1")}
               </div>
 
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
                 <Bot className="h-5 w-5 text-orange-500" />
-                Renovation recommendations
+                {t("aiSection.insight2")}
               </div>
 
               <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
                 <Euro className="h-5 w-5 text-orange-500" />
-                Indicative costs and savings
+                {t("aiSection.insight3")}
               </div>
             </div>
 
@@ -57,20 +57,19 @@ export default function AISection() {
               onClick={() => navigate("/ai-scan")}
               className="group mt-9 inline-flex h-12 items-center justify-center rounded-xl bg-slate-950 px-6 text-sm font-bold text-white transition hover:bg-orange-600"
             >
-              Start AI Home Scan
+              {t("aiSection.startScan")}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
 
             <p className="mt-4 text-xs leading-5 text-slate-400">
-              Results are indicative and intended to support renovation
-              planning and decision-making.
+              {t("aiSection.disclaimer")}
             </p>
           </div>
 
-          {/* Right - simplified preview */}
+          {/* Right */}
           <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-5 sm:p-7">
             <div className="rounded-[22px] bg-white p-6 sm:p-8">
-              
+
               <div className="flex items-center justify-between border-b border-slate-100 pb-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
@@ -79,60 +78,59 @@ export default function AISection() {
 
                   <div>
                     <p className="font-bold text-slate-950">
-                      Home analysis preview
+                      {t("aiSection.previewTitle")}
                     </p>
+
                     <p className="mt-0.5 text-sm text-slate-500">
-                      Example Bouwiser guidance
+                      {t("aiSection.previewSubtitle")}
                     </p>
                   </div>
                 </div>
 
                 <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                  Example
+                  {t("aiSection.example")}
                 </span>
               </div>
 
               <div className="py-7">
                 <p className="text-sm font-medium text-slate-500">
-                  Renovation opportunity
+                  {t("aiSection.opportunity")}
                 </p>
 
                 <h3 className="mt-2 text-2xl font-extrabold text-slate-950">
-                  Improve insulation before upgrading the heating system
+                  {t("aiSection.recommendationTitle")}
                 </h3>
 
                 <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-                  Based on the example home profile, improving roof and wall
-                  insulation could reduce heat loss and improve the impact of
-                  future heating upgrades.
+                  {t("aiSection.recommendationDescription")}
                 </p>
               </div>
 
               <div className="grid gap-3 border-t border-slate-100 pt-6 sm:grid-cols-3">
                 <div>
                   <p className="text-xs font-medium text-slate-400">
-                    Energy impact
+                    {t("aiSection.energyImpact")}
                   </p>
                   <p className="mt-1 font-bold text-slate-900">
-                    High
+                    {t("aiSection.high")}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-xs font-medium text-slate-400">
-                    Cost indication
+                    {t("aiSection.costIndication")}
                   </p>
                   <p className="mt-1 font-bold text-slate-900">
-                    Medium
+                    {t("aiSection.medium")}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-xs font-medium text-slate-400">
-                    Priority
+                    {t("aiSection.priority")}
                   </p>
                   <p className="mt-1 font-bold text-slate-900">
-                    Recommended
+                    {t("aiSection.recommended")}
                   </p>
                 </div>
               </div>

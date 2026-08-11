@@ -4,27 +4,30 @@ import {
   Users,
   Route,
 } from "lucide-react";
-
-const items = [
-  {
-    icon: BrainCircuit,
-    title: "AI guidance",
-  },
-  {
-    icon: Home,
-    title: "Energy insights",
-  },
-  {
-    icon: Users,
-    title: "Renovation expertise",
-  },
-  {
-    icon: Route,
-    title: "Personal roadmap",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export default function TrustedBy() {
+  const { t } = useTranslation();
+
+  const items = [
+    {
+      icon: BrainCircuit,
+      title: t("trusted.aiGuidance"),
+    },
+    {
+      icon: Home,
+      title: t("trusted.energyInsights"),
+    },
+    {
+      icon: Users,
+      title: t("trusted.renovationExpertise"),
+    },
+    {
+      icon: Route,
+      title: t("trusted.personalRoadmap"),
+    },
+  ];
+
   return (
     <section className="border-y border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

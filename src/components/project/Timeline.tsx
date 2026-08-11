@@ -3,6 +3,7 @@ import {
   Circle,
   Clock3,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type {
   ProjectData,
@@ -45,19 +46,63 @@ function getStatusStyles(
 export default function Timeline({
   project,
 }: TimelineProps) {
+  const { t } = useTranslation();
+
+  const translateKnownValue = (value: string) => {
+    const knownValues: Record<string, string> = {
+      Completed: t("timeline.status.completed"),
+      Voltooid: t("timeline.status.completed"),
+      Current: t("timeline.status.current"),
+      Huidig: t("timeline.status.current"),
+      Upcoming: t("timeline.status.upcoming"),
+      Aankomend: t("timeline.status.upcoming"),
+
+      "Property analysis": t("timeline.items.propertyAnalysis.title"),
+      "Woninganalyse": t("timeline.items.propertyAnalysis.title"),
+      "AI renovation plan": t("timeline.items.aiPlan.title"),
+      "AI-renovatieplan": t("timeline.items.aiPlan.title"),
+      "Product selection": t("timeline.items.productSelection.title"),
+      "Productselectie": t("timeline.items.productSelection.title"),
+      Installation: t("timeline.items.installation.title"),
+      Installatie: t("timeline.items.installation.title"),
+
+      "Property details and energy performance analysed.":
+        t("timeline.items.propertyAnalysis.description"),
+      "Woninggegevens en energieprestatie geanalyseerd.":
+        t("timeline.items.propertyAnalysis.description"),
+
+      "Recommended renovation measures generated based on the home profile.":
+        t("timeline.items.aiPlan.description"),
+      "Aanbevolen renovatiemaatregelen gegenereerd op basis van het woningprofiel.":
+        t("timeline.items.aiPlan.description"),
+
+      "Compare suitable products and retailer offers.":
+        t("timeline.items.productSelection.description"),
+      "Vergelijk geschikte producten en aanbiedingen van winkels.":
+        t("timeline.items.productSelection.description"),
+
+      "Plan and complete the selected renovation measures.":
+        t("timeline.items.installation.description"),
+      "Plan en voltooi de geselecteerde renovatiemaatregelen.":
+        t("timeline.items.installation.description"),
+    };
+
+    return knownValues[value] ?? value;
+  };
+
   return (
     <section className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
       <div>
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-          Project timeline
+          {t("timeline.eyebrow")}
         </p>
 
         <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-          Renovation journey
+          {t("timeline.title")}
         </h2>
 
         <p className="mt-3 text-sm leading-6 text-slate-500">
-          Follow every stage from property analysis to final installation.
+          {t("timeline.description")}
         </p>
       </div>
 
@@ -97,18 +142,18 @@ export default function Timeline({
                 <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                   <div>
                     <h3 className="text-lg font-black text-slate-950">
-                      {item.title}
+                      {translateKnownValue(item.title)}
                     </h3>
 
                     <p className="mt-2 text-sm leading-6 text-slate-500">
-                      {item.description}
+                      {translateKnownValue(item.description)}
                     </p>
                   </div>
 
                   <span
                     className={`w-fit shrink-0 rounded-full px-3 py-1 text-xs font-bold ${styles.badge}`}
                   >
-                    {item.status}
+                    {translateKnownValue(item.status)}
                   </span>
                 </div>
 

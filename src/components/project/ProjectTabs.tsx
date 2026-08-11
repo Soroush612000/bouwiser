@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   ReceiptText,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ProjectTabsProps {
   activeTab: string;
@@ -15,31 +16,38 @@ interface ProjectTabsProps {
 
 const tabs = [
   {
-    label: "Overview",
+    value: "Overview",
+    labelKey: "projectTabs.overview",
     icon: LayoutDashboard,
   },
   {
-    label: "AI Report",
+    value: "AI Report",
+    labelKey: "projectTabs.aiReport",
     icon: Bot,
   },
   {
-    label: "Photos",
+    value: "Photos",
+    labelKey: "projectTabs.photos",
     icon: Camera,
   },
   {
-    label: "Documents",
+    value: "Documents",
+    labelKey: "projectTabs.documents",
     icon: FileText,
   },
   {
-    label: "Quotes",
+    value: "Quotes",
+    labelKey: "projectTabs.quotes",
     icon: ReceiptText,
   },
   {
-    label: "Tasks",
+    value: "Tasks",
+    labelKey: "projectTabs.tasks",
     icon: ClipboardCheck,
   },
   {
-    label: "Budget",
+    value: "Budget",
+    labelKey: "projectTabs.budget",
     icon: Calculator,
   },
 ];
@@ -48,18 +56,20 @@ export default function ProjectTabs({
   activeTab,
   onChange,
 }: ProjectTabsProps) {
+  const { t } = useTranslation();
+
   return (
     <section className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white p-2 shadow-sm">
       <div className="flex min-w-max gap-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.label;
+          const isActive = activeTab === tab.value;
 
           return (
             <button
-              key={tab.label}
+              key={tab.value}
               type="button"
-              onClick={() => onChange(tab.label)}
+              onClick={() => onChange(tab.value)}
               className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition ${
                 isActive
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
@@ -67,7 +77,7 @@ export default function ProjectTabs({
               }`}
             >
               <Icon className="h-4 w-4" />
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           );
         })}

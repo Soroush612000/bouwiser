@@ -1,0 +1,36 @@
+{
+    "nav": {
+      "home": "Home",
+      "projects": "Mijn projecten",
+      "marketplace": "Producten",
+      "compare": "Vergelijken",
+      "energy": "Energie",
+      "aiAssistant": "AI-assistent",
+      "partners": "Partners",
+      "about": "Over ons",
+      "contact": "Contact",
+      "startScan": "Start AI-woningscan"
+    },
+    "products": {
+      "browseTitle": "Bekijk en vergelijk producten",
+      "browseDescription": "Vergelijk bouwproducten, prijzen en prestaties.",
+      "categories": {
+        "insulation": "Isolatie",
+        "windows": "Ramen",
+        "flooring": "Vloeren",
+        "heating": "Verwarming",
+        "solar": "Zonne-energie",
+        "materials": "Materialen"
+      }
+    },
+    "comparison": {
+      "title": "Vergelijk slimmer.",
+      "description": "Vergelijk producten, specificaties en winkelprijzen op één plek.",
+      "action": "Bekijk producten"
+    },
+    "common": {
+      "language": "Taal",
+      "dutch": "Nederlands",
+      "english": "Engels"
+    }
+  }

@@ -4,6 +4,7 @@ import {
   Clock3,
   WalletCards,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { ProjectData } from "../../data/project";
 
@@ -25,19 +26,41 @@ const iconStyles = [
   "bg-violet-100 text-violet-600",
 ];
 
+const kpiTranslationKeys = [
+  {
+    label: "projectKpis.estimatedBudget",
+    description: "projectKpis.totalPlannedInvestment",
+  },
+  {
+    label: "projectKpis.availableSubsidy",
+    description: "projectKpis.estimatedEligibleSupport",
+  },
+  {
+    label: "projectKpis.annualSaving",
+    description: "projectKpis.expectedYearlyEnergySaving",
+  },
+  {
+    label: "projectKpis.returnOnInvestment",
+    description: "projectKpis.estimatedPaybackPeriod",
+  },
+];
+
 export default function KPICards({
   project,
 }: KPICardsProps) {
+  const { t } = useTranslation();
+
   return (
     <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
       {project.kpis.map((kpi, index) => {
         const Icon = icons[index] ?? WalletCards;
         const iconStyle =
           iconStyles[index] ?? "bg-slate-100 text-slate-600";
+        const translation = kpiTranslationKeys[index];
 
         return (
           <article
-            key={kpi.label}
+            key={`${kpi.label}-${index}`}
             className="group rounded-[26px] border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-orange-200 hover:shadow-xl"
           >
             <div className="flex items-start justify-between gap-4">
@@ -48,12 +71,12 @@ export default function KPICards({
               </div>
 
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500 transition group-hover:bg-orange-50 group-hover:text-orange-600">
-                Overview
+                {t("projectKpis.overview")}
               </span>
             </div>
 
             <p className="mt-6 text-sm font-semibold text-slate-500">
-              {kpi.label}
+              {translation ? t(translation.label) : kpi.label}
             </p>
 
             <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">
@@ -61,7 +84,7 @@ export default function KPICards({
             </p>
 
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              {kpi.description}
+              {translation ? t(translation.description) : kpi.description}
             </p>
 
             <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-slate-100">

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowUpDown,
   Check,
@@ -82,8 +83,8 @@ type SortOption =
 
 const COMPARE_STORAGE_KEY = "bouwiser_compare_products";
 
-function formatEuro(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
+function formatEuro(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,
@@ -125,7 +126,24 @@ function readCompareIds() {
 
 export default function Products() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const numberLocale =
+    i18n.language?.startsWith("en") ? "en-NL" : "nl-NL";
+
+  const taxonomyLabel = (
+    slug: string | null | undefined,
+    fallback: string | null | undefined,
+  ) => {
+    if (!slug) {
+      return fallback ?? "";
+    }
+
+    return t(`taxonomy.${slug}`, {
+      defaultValue: fallback ?? slug,
+    });
+  };
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -259,9 +277,7 @@ export default function Products() {
           error,
         );
 
-        setLoadError(
-          "We could not load the product marketplace.",
-        );
+        setLoadError("productsPage.loadErrorMessage");
 
         setLoading(false);
         return;
@@ -392,6 +408,14 @@ export default function Products() {
         product.color,
         product.product_categories?.name,
         product.product_subcategories?.name,
+        taxonomyLabel(
+          product.product_categories?.slug,
+          product.product_categories?.name,
+        ),
+        taxonomyLabel(
+          product.product_subcategories?.slug,
+          product.product_subcategories?.name,
+        ),
       ];
 
       const matchesSearch =
@@ -461,6 +485,7 @@ export default function Products() {
     selectedSubcategory,
     selectedStore,
     sortBy,
+    i18n.language,
   ]);
 
   /*
@@ -523,19 +548,17 @@ export default function Products() {
           <div className="mx-auto max-w-7xl px-6 py-9 lg:px-8 lg:py-10">
             <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a90f35]">
-                Products
+                {t("productsPage.eyebrow")}
               </p>
 
               <h1 className="mt-3 text-4xl font-semibold leading-[1.08] tracking-[-0.04em] text-slate-950 sm:text-[46px]">
-                Find and compare
+                {t("productsPage.titleLine1")}
                 <br className="hidden sm:block" />
-                building products.
+                {t("productsPage.titleLine2")}
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                Search renovation products, compare
-                specifications and retailer prices, then
-                continue to the store when you are ready.
+                {t("productsPage.description")}
               </p>
 
               {/* Search */}
@@ -550,7 +573,7 @@ export default function Products() {
                   onChange={(event) =>
                     setSearchQuery(event.target.value)
                   }
-                  placeholder="Search products, brands or materials..."
+                  placeholder={t("productsPage.searchPlaceholder")}
                   className="h-12 w-full rounded-lg border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
                 />
               </div>
@@ -578,7 +601,7 @@ export default function Products() {
                   />
 
                   <h2 className="text-sm font-semibold text-slate-900">
-                    Filters
+                    {t("productsPage.filters")}
                   </h2>
                 </div>
 
@@ -588,7 +611,7 @@ export default function Products() {
                     onClick={clearFilters}
                     className="text-xs font-medium text-slate-400 transition hover:text-[#a90f35]"
                   >
-                    Clear
+                    {t("productsPage.clear")}
                   </button>
                 )}
               </div>
@@ -598,7 +621,7 @@ export default function Products() {
 
                 <label className="block">
                   <span className="text-xs font-medium text-slate-500">
-                    Category
+                    {t("productsPage.category")}
                   </span>
 
                   <select
@@ -613,7 +636,7 @@ export default function Products() {
                     className="mt-2 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-slate-400"
                   >
                     <option value="">
-                      All categories
+                      {t("productsPage.allCategories")}
                     </option>
 
                     {categories.map((category) => (
@@ -621,7 +644,7 @@ export default function Products() {
                         key={category.id}
                         value={category.slug}
                       >
-                        {category.name}
+                        {taxonomyLabel(category.slug, category.name)}
                       </option>
                     ))}
                   </select>
@@ -631,7 +654,7 @@ export default function Products() {
 
                 <label className="block">
                   <span className="text-xs font-medium text-slate-500">
-                    Subcategory
+                    {t("productsPage.subcategory")}
                   </span>
 
                   <select
@@ -646,8 +669,8 @@ export default function Products() {
                   >
                     <option value="">
                       {selectedCategory
-                        ? "All subcategories"
-                        : "Select a category first"}
+                        ? t("productsPage.allSubcategories")
+                        : t("productsPage.selectCategoryFirst")}
                     </option>
 
                     {visibleSubcategories.map(
@@ -656,7 +679,7 @@ export default function Products() {
                           key={subcategory.id}
                           value={subcategory.slug}
                         >
-                          {subcategory.name}
+                          {taxonomyLabel(subcategory.slug, subcategory.name)}
                         </option>
                       ),
                     )}
@@ -667,7 +690,7 @@ export default function Products() {
 
                 <label className="block">
                   <span className="text-xs font-medium text-slate-500">
-                    Retailer
+                    {t("productsPage.retailer")}
                   </span>
 
                   <select
@@ -680,7 +703,7 @@ export default function Products() {
                     className="mt-2 h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition focus:border-slate-400"
                   >
                     <option value="">
-                      All retailers
+                      {t("productsPage.allRetailers")}
                     </option>
 
                     {stores.map((store) => (
@@ -707,15 +730,13 @@ export default function Products() {
               <div className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    {filteredProducts.length}{" "}
-                    {filteredProducts.length === 1
-                      ? "product"
-                      : "products"}
+                    {t("productsPage.resultCount", {
+                      count: filteredProducts.length,
+                    })}
                   </p>
 
                   <p className="mt-1 text-xs text-slate-400">
-                    Compare product information and retailer
-                    offers.
+                    {t("productsPage.resultsDescription")}
                   </p>
                 </div>
 
@@ -735,23 +756,23 @@ export default function Products() {
                     className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-600 outline-none transition focus:border-slate-400"
                   >
                     <option value="featured">
-                      Featured
+                      {t("productsPage.sort.featured")}
                     </option>
 
                     <option value="price-low">
-                      Lowest price
+                      {t("productsPage.sort.lowestPrice")}
                     </option>
 
                     <option value="price-high">
-                      Highest price
+                      {t("productsPage.sort.highestPrice")}
                     </option>
 
                     <option value="rating-high">
-                      Highest rating
+                      {t("productsPage.sort.highestRating")}
                     </option>
 
                     <option value="name">
-                      Product name
+                      {t("productsPage.sort.productName")}
                     </option>
                   </select>
                 </label>
@@ -766,7 +787,7 @@ export default function Products() {
                   <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900" />
 
                   <p className="mt-4 text-sm text-slate-500">
-                    Loading products...
+                    {t("productsPage.loading")}
                   </p>
                 </div>
               )}
@@ -778,11 +799,11 @@ export default function Products() {
               {!loading && loadError && (
                 <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6">
                   <p className="font-semibold text-red-900">
-                    Products could not be loaded
+                    {t("productsPage.eyebrow")} could not be loaded
                   </p>
 
                   <p className="mt-2 text-sm text-red-700">
-                    {loadError}
+                    {t(loadError)}
                   </p>
                 </div>
               )}
@@ -801,11 +822,11 @@ export default function Products() {
                     />
 
                     <h3 className="mt-4 text-lg font-semibold text-slate-900">
-                      No matching products
+                      {t("productsPage.noMatchingProducts")}
                     </h3>
 
                     <p className="mt-2 text-sm text-slate-500">
-                      Try changing your search or filters.
+                      {t("productsPage.tryChangingFilters")}
                     </p>
 
                     <button
@@ -813,7 +834,7 @@ export default function Products() {
                       onClick={clearFilters}
                       className="mt-5 text-sm font-semibold text-[#a90f35]"
                     >
-                      Clear filters
+                      {t("productsPage.clear")} filters
                     </button>
                   </div>
                 )}
@@ -865,13 +886,17 @@ export default function Products() {
                             <div className="flex items-start justify-between gap-4">
                               <div className="min-w-0">
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#a90f35]">
-                                  {product
-                                    .product_subcategories
-                                    ?.name ??
-                                    product
-                                      .product_categories
-                                      ?.name ??
-                                    "Building product"}
+                                  {product.product_subcategories
+                                    ? taxonomyLabel(
+                                        product.product_subcategories.slug,
+                                        product.product_subcategories.name,
+                                      )
+                                    : product.product_categories
+                                      ? taxonomyLabel(
+                                          product.product_categories.slug,
+                                          product.product_categories.name,
+                                        )
+                                      : t("productsPage.buildingProduct")}
                                 </p>
 
                                 <h2 className="mt-2 line-clamp-2 text-base font-semibold leading-6 text-slate-950">
@@ -903,13 +928,14 @@ export default function Products() {
                                 <div className="flex items-end justify-between gap-4">
                                   <div>
                                     <p className="text-xs text-slate-400">
-                                      From
+                                      {t("productsPage.from")}
                                     </p>
 
                                     <p className="mt-1 text-xl font-semibold tracking-[-0.02em] text-slate-950">
                                       {formatEuro(
                                         bestOffer.price_per_unit ??
                                           bestOffer.price,
+                                        numberLocale,
                                       )}
 
                                       {bestOffer.price_per_unit &&
@@ -926,12 +952,12 @@ export default function Products() {
 
                                   <span className="max-w-[90px] truncate text-right text-xs font-medium text-slate-500">
                                     {bestOffer.stores
-                                      ?.name ?? "Retailer"}
+                                      ?.name ?? t("productsPage.retailer")}
                                   </span>
                                 </div>
                               ) : (
                                 <p className="text-sm text-slate-400">
-                                  No current retailer offer
+                                  {t("productsPage.noCurrentOffer")}
                                 </p>
                               )}
                             </div>
@@ -944,7 +970,7 @@ export default function Products() {
                                 {product.material && (
                                   <div className="flex items-start justify-between gap-4 text-xs">
                                     <span className="text-slate-400">
-                                      Material
+                                      {t("productsPage.material")}
                                     </span>
 
                                     <span className="max-w-[55%] text-right font-medium text-slate-600">
@@ -994,10 +1020,10 @@ export default function Products() {
                                 {isSelected ? (
                                   <>
                                     <Check className="h-3.5 w-3.5" />
-                                    Selected
+                                    {t("productsPage.selected")}
                                   </>
                                 ) : (
-                                  "Compare"
+                                  t("productsPage.compare")
                                 )}
                               </button>
 
@@ -1010,7 +1036,7 @@ export default function Products() {
                                   rel="noreferrer"
                                   className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
                                 >
-                                  Visit store
+                                  {t("productsPage.visitStore")}
 
                                   <ExternalLink className="h-3.5 w-3.5" />
                                 </a>
@@ -1020,7 +1046,7 @@ export default function Products() {
                                   disabled
                                   className="h-10 cursor-not-allowed rounded-lg border border-slate-200 px-3 text-xs text-slate-300"
                                 >
-                                  No offer
+                                  {t("productsPage.noOffer")}
                                 </button>
                               )}
                             </div>
@@ -1044,11 +1070,9 @@ export default function Products() {
           <div className="flex flex-col gap-3 rounded-xl border border-slate-700 bg-slate-950 px-5 py-4 text-white shadow-xl sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-sm font-semibold">
-                {compareIds.length}{" "}
-                {compareIds.length === 1
-                  ? "product"
-                  : "products"}{" "}
-                selected
+                {t("productsPage.selectedCount", {
+                  count: compareIds.length,
+                })}
               </p>
 
               <p className="mt-1 truncate text-xs text-slate-400">
@@ -1080,7 +1104,7 @@ export default function Products() {
                 }
                 className="h-9 rounded-lg bg-white px-4 text-xs font-semibold text-slate-950 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
               >
-                Compare products
+                {t("productsPage.compareProducts")}
               </button>
             </div>
           </div>

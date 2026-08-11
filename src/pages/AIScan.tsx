@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/utils/supabase";
 import {
   ArrowLeft,
@@ -23,6 +24,7 @@ import {
   Sparkles,
   SunMedium,
   Upload,
+  Trash2,
   WandSparkles,
   Zap,
 } from "lucide-react";
@@ -54,37 +56,19 @@ interface PropertyForm {
   goals: GoalType[];
 }
 
+interface UploadedPhoto {
+  category: string;
+  path: string;
+  fileName: string;
+  previewUrl?: string;
+}
+
 const steps = [
-  {
-    id: 1,
-    title: "Property",
-    description: "Basic details",
-    icon: Home,
-  },
-  {
-    id: 2,
-    title: "Photos",
-    description: "Home images",
-    icon: ImagePlus,
-  },
-  {
-    id: 3,
-    title: "Energy",
-    description: "Usage profile",
-    icon: Zap,
-  },
-  {
-    id: 4,
-    title: "Goals",
-    description: "Your priorities",
-    icon: Goal,
-  },
-  {
-    id: 5,
-    title: "Analysis",
-    description: "AI assessment",
-    icon: Bot,
-  },
+  { id: 1, titleKey: "aiScan.steps.property.title", descriptionKey: "aiScan.steps.property.description", icon: Home },
+  { id: 2, titleKey: "aiScan.steps.photos.title", descriptionKey: "aiScan.steps.photos.description", icon: ImagePlus },
+  { id: 3, titleKey: "aiScan.steps.energy.title", descriptionKey: "aiScan.steps.energy.description", icon: Zap },
+  { id: 4, titleKey: "aiScan.steps.goals.title", descriptionKey: "aiScan.steps.goals.description", icon: Goal },
+  { id: 5, titleKey: "aiScan.steps.analysis.title", descriptionKey: "aiScan.steps.analysis.description", icon: Bot },
 ];
 
 const propertyTypes: {
@@ -98,68 +82,83 @@ const propertyTypes: {
 ];
 
 const photoCategories = [
-  "Front facade",
-  "Back facade",
-  "Roof",
-  "Windows",
-  "Heating system",
-  "Meter cupboard",
+  { value: "Front facade", key: "aiScan.photoCategories.frontFacade" },
+  { value: "Back facade", key: "aiScan.photoCategories.backFacade" },
+  { value: "Roof", key: "aiScan.photoCategories.roof" },
+  { value: "Windows", key: "aiScan.photoCategories.windows" },
+  { value: "Heating system", key: "aiScan.photoCategories.heatingSystem" },
+  { value: "Meter cupboard", key: "aiScan.photoCategories.meterCupboard" },
 ];
 
 const renovationGoals: {
   label: GoalType;
   icon: typeof Leaf;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
 }[] = [
   {
     label: "Lower energy bills",
     icon: Zap,
-    description: "Reduce monthly gas and electricity costs.",
+    titleKey: "aiScan.goals.lowerBills.title",
+    descriptionKey: "aiScan.goals.lowerBills.description",
   },
   {
     label: "Improve comfort",
     icon: Home,
-    description: "Create a warmer and more comfortable home.",
+    titleKey: "aiScan.goals.comfort.title",
+    descriptionKey: "aiScan.goals.comfort.description",
   },
   {
     label: "Increase home value",
     icon: Building2,
-    description: "Improve long-term property value.",
+    titleKey: "aiScan.goals.homeValue.title",
+    descriptionKey: "aiScan.goals.homeValue.description",
   },
   {
     label: "Install solar panels",
     icon: SunMedium,
-    description: "Generate renewable electricity at home.",
+    titleKey: "aiScan.goals.solar.title",
+    descriptionKey: "aiScan.goals.solar.description",
   },
   {
     label: "Install a heat pump",
     icon: Flame,
-    description: "Upgrade to efficient low-carbon heating.",
+    titleKey: "aiScan.goals.heatPump.title",
+    descriptionKey: "aiScan.goals.heatPump.description",
   },
   {
     label: "Improve insulation",
     icon: Ruler,
-    description: "Reduce heat loss through roof, walls and floor.",
+    titleKey: "aiScan.goals.insulation.title",
+    descriptionKey: "aiScan.goals.insulation.description",
   },
 ];
 
 const analysisItems = [
-  "Reviewing property information",
-  "Analysing energy performance",
-  "Checking insulation opportunities",
-  "Estimating solar potential",
-  "Calculating available subsidies",
-  "Preparing renovation recommendations",
+  "aiScan.analysisItems.property",
+  "aiScan.analysisItems.energy",
+  "aiScan.analysisItems.insulation",
+  "aiScan.analysisItems.solar",
+  "aiScan.analysisItems.subsidies",
+  "aiScan.analysisItems.recommendations",
 ];
 
 export default function AIScan() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const [uploadedPhotos, setUploadedPhotos] = useState<UploadedPhoto[]>([]);
+  const [uploadingCategory, setUploadingCategory] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [analysisStarted, setAnalysisStarted] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [projectId, setProjectId] = useState<number | null>(null);
+  const [saveState, setSaveState] = useState<
+    "saved" | "saving" | "unsaved" | "local"
+  >("saved");
+  const [isLoadingDraft, setIsLoadingDraft] = useState(true);
 
   const [form, setForm] = useState<PropertyForm>({
     address: "",
@@ -179,6 +178,340 @@ export default function AIScan() {
     [currentStep],
   );
 
+  const parseNumericValue = (value: string) => {
+    const normalized = value
+      .replace(/\s/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "");
+
+    if (!normalized) return null;
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const calculateAnalysis = () => {
+    const area = parseNumericValue(form.floorArea) ?? 100;
+    const gas = parseNumericValue(form.gasUsage) ?? 0;
+    const electricity = parseNumericValue(form.electricityUsage) ?? 0;
+    const year = parseNumericValue(form.yearBuilt) ?? 1990;
+
+    const labelOrder = ["G", "F", "E", "D", "C", "B", "A"];
+    const currentLabel = labelOrder.includes(form.energyLabel)
+      ? form.energyLabel
+      : "D";
+    const currentIndex = labelOrder.indexOf(currentLabel);
+
+    let improvementPoints = 0;
+    let annualSaving = 0;
+
+    if (form.goals.includes("Improve insulation")) {
+      improvementPoints += 1.2;
+      annualSaving += Math.max(180, Math.min(420, area * 2.1));
+    }
+
+    if (form.goals.includes("Install a heat pump")) {
+      improvementPoints += 1.1;
+      annualSaving += Math.max(220, Math.min(520, gas * 0.22));
+    }
+
+    if (form.goals.includes("Install solar panels")) {
+      improvementPoints += 0.9;
+      annualSaving += Math.max(180, Math.min(650, electricity * 0.14));
+    }
+
+    if (form.goals.includes("Lower energy bills")) {
+      improvementPoints += 0.4;
+      annualSaving += Math.max(80, Math.min(220, (gas + electricity / 10) * 0.06));
+    }
+
+    if (year < 1980) improvementPoints += 0.5;
+    else if (year < 2000) improvementPoints += 0.25;
+
+    const labelGain = Math.max(1, Math.min(3, Math.round(improvementPoints)));
+    const targetIndex = Math.min(labelOrder.length - 1, currentIndex + labelGain);
+    const targetEnergyLabel = labelOrder[targetIndex];
+
+    if (annualSaving === 0) {
+      annualSaving = Math.max(
+        180,
+        Math.min(780, gas * 0.12 + electricity * 0.06 + area * 1.1),
+      );
+    }
+
+    const co2Reduction = Math.round(
+      Math.max(
+        8,
+        Math.min(
+          45,
+          10 +
+            labelGain * 6 +
+            (gas > 1200 ? 5 : 0) +
+            (form.goals.includes("Install solar panels") ? 5 : 0),
+        ),
+      ),
+    );
+
+    const completenessScore =
+      [form.address, form.city, form.postalCode, form.propertyType, form.yearBuilt, form.floorArea, form.energyLabel]
+        .filter(Boolean).length * 8 +
+      (form.gasUsage ? 8 : 0) +
+      (form.electricityUsage ? 8 : 0) +
+      Math.min(12, form.goals.length * 3) +
+      Math.min(12, uploadedPhotos.length * 2);
+
+    const confidence = Math.max(62, Math.min(94, 55 + completenessScore));
+
+    return {
+      confidence: Math.round(confidence),
+      targetEnergyLabel,
+      annualSaving: Math.round(annualSaving / 10) * 10,
+      co2Reduction,
+    };
+  };
+
+  const analysisResult = useMemo(
+    () => calculateAnalysis(),
+    [form, uploadedPhotos],
+  );
+
+  const projectNameFromForm = () =>
+    form.address || form.city
+      ? `${form.address || "Home"} - ${form.city || ""}`.trim()
+      : "My Renovation Project";
+
+  const saveLocalDraft = (
+    step: number,
+    scanStatus: "in_progress" | "completed",
+  ) => {
+    const localDraft = {
+      projectId,
+      currentStep: step,
+      form,
+      uploadedPhotos: uploadedPhotos.map(({ category, path, fileName }) => ({
+        category,
+        path,
+        fileName,
+      })),
+      scanStatus,
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("bouwiser_scan_draft", JSON.stringify(localDraft));
+  };
+
+  const applySavedProject = (project: any) => {
+    const savedGoals = String(project.renovation_goal ?? "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter((item): item is GoalType =>
+        renovationGoals.some((goal) => goal.label === item),
+      );
+
+    setProjectId(project.id ?? null);
+    setCurrentStep(
+      Math.min(5, Math.max(1, Number(project.scan_step) || 1)),
+    );
+    setUploadedPhotos(
+      Array.isArray(project.photo_categories)
+        ? project.photo_categories
+            .map((item: unknown) => {
+              if (typeof item === "string") {
+                return {
+                  category: item,
+                  path: "",
+                  fileName: "",
+                } satisfies UploadedPhoto;
+              }
+
+              if (
+                item &&
+                typeof item === "object" &&
+                "category" in item &&
+                typeof (item as { category?: unknown }).category === "string"
+              ) {
+                const photo = item as {
+                  category: string;
+                  path?: unknown;
+                  fileName?: unknown;
+                };
+
+                return {
+                  category: photo.category,
+                  path: typeof photo.path === "string" ? photo.path : "",
+                  fileName:
+                    typeof photo.fileName === "string" ? photo.fileName : "",
+                } satisfies UploadedPhoto;
+              }
+
+              return null;
+            })
+            .filter((item: UploadedPhoto | null): item is UploadedPhoto => item !== null)
+        : [],
+    );
+
+    setForm({
+      address: project.street_address ?? "",
+      city: project.city ?? "",
+      postalCode: project.postal_code ?? "",
+      propertyType: propertyTypes.some(
+        (item) => item.label === project.property_type,
+      )
+        ? project.property_type
+        : "",
+      yearBuilt: project.construction_year
+        ? String(project.construction_year)
+        : "",
+      floorArea: project.floor_area ? String(project.floor_area) : "",
+      energyLabel: project.current_energy_label ?? "",
+      gasUsage:
+        project.annual_gas_usage !== null &&
+        project.annual_gas_usage !== undefined
+          ? String(project.annual_gas_usage)
+          : "",
+      electricityUsage:
+        project.annual_electricity_usage !== null &&
+        project.annual_electricity_usage !== undefined
+          ? String(project.annual_electricity_usage)
+          : "",
+      goals: savedGoals,
+    });
+
+    if (project.scan_status === "completed") {
+      setAnalysisStarted(true);
+      setAnalysisComplete(true);
+      setAnalysisProgress(100);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadDraft = async () => {
+      setIsLoadingDraft(true);
+
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+
+      if (user) {
+        const storedProjectId = localStorage.getItem(
+          "bouwiser_active_scan_project_id",
+        );
+
+        if (storedProjectId) {
+          const { data } = await supabase
+            .from("Projects")
+            .select("*")
+            .eq("id", storedProjectId)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (!cancelled && data) {
+            applySavedProject(data);
+            setSaveState("saved");
+            setIsLoadingDraft(false);
+            return;
+          }
+        }
+
+        const { data } = await supabase
+          .from("Projects")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("scan_status", "in_progress")
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!cancelled && data) {
+          applySavedProject(data);
+          localStorage.setItem(
+            "bouwiser_active_scan_project_id",
+            String(data.id),
+          );
+          setSaveState("saved");
+          setIsLoadingDraft(false);
+          return;
+        }
+      }
+
+      const localDraft = localStorage.getItem("bouwiser_scan_draft");
+
+      if (!cancelled && localDraft) {
+        try {
+          const parsed = JSON.parse(localDraft);
+
+          if (parsed?.scanStatus === "in_progress") {
+            setCurrentStep(
+              Math.min(5, Math.max(1, Number(parsed.currentStep) || 1)),
+            );
+            setUploadedPhotos(
+              Array.isArray(parsed.uploadedPhotos)
+                ? parsed.uploadedPhotos
+                    .map((item: unknown) => {
+                      if (typeof item === "string") {
+                        return {
+                          category: item,
+                          path: "",
+                          fileName: "",
+                        } satisfies UploadedPhoto;
+                      }
+
+                      if (
+                        item &&
+                        typeof item === "object" &&
+                        "category" in item &&
+                        typeof (item as { category?: unknown }).category ===
+                          "string"
+                      ) {
+                        const photo = item as {
+                          category: string;
+                          path?: unknown;
+                          fileName?: unknown;
+                        };
+
+                        return {
+                          category: photo.category,
+                          path: typeof photo.path === "string" ? photo.path : "",
+                          fileName:
+                            typeof photo.fileName === "string"
+                              ? photo.fileName
+                              : "",
+                        } satisfies UploadedPhoto;
+                      }
+
+                      return null;
+                    })
+                    .filter((item: UploadedPhoto | null): item is UploadedPhoto => item !== null)
+                : [],
+            );
+
+            if (parsed.form) {
+              setForm((previous) => ({
+                ...previous,
+                ...parsed.form,
+              }));
+            }
+
+            setSaveState("local");
+          }
+        } catch (error) {
+          console.error("Could not restore the local AI Scan draft:", error);
+        }
+      }
+
+      if (!cancelled) {
+        setIsLoadingDraft(false);
+      }
+    };
+
+    void loadDraft();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const updateField = <Key extends keyof PropertyForm>(
     field: Key,
     value: PropertyForm[Key],
@@ -187,6 +520,7 @@ export default function AIScan() {
       ...previous,
       [field]: value,
     }));
+    setSaveState("unsaved");
   };
 
   const toggleGoal = (goal: GoalType) => {
@@ -196,20 +530,303 @@ export default function AIScan() {
         ? previous.goals.filter((item) => item !== goal)
         : [...previous.goals, goal],
     }));
+    setSaveState("unsaved");
   };
 
-  const togglePhoto = (category: string) => {
-    setUploadedPhotos((previous) =>
-      previous.includes(category)
-        ? previous.filter((item) => item !== category)
-        : [...previous, category],
-    );
-  };
+  const handlePhotoUpload = async (
+    category: string,
+    file: File | undefined,
+  ) => {
+    if (!file || uploadingCategory) return;
 
-  const goNext = () => {
-    if (currentStep < 5) {
-      setCurrentStep((previous) => previous + 1);
+    setPhotoError(null);
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError(t("aiScan.errors.chooseImage"));
+      return;
     }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setPhotoError(t("aiScan.errors.imageTooLarge"));
+      return;
+    }
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const user = userData.user;
+
+    if (userError || !user) {
+      setPhotoError(t("aiScan.errors.signInForPhotos"));
+      return;
+    }
+
+    setUploadingCategory(category);
+
+    try {
+      const safeCategory = category
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const uniqueName = `${safeCategory}-${Date.now()}.${extension}`;
+
+      // First folder is always the authenticated user id, matching the Storage RLS policy.
+      const storagePath = `${user.id}/${projectId ?? "draft"}/${uniqueName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("project-photos")
+        .upload(storagePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const previewUrl = URL.createObjectURL(file);
+
+      setUploadedPhotos((previous) => [
+        ...previous.filter((photo) => photo.category !== category),
+        {
+          category,
+          path: storagePath,
+          fileName: file.name,
+          previewUrl,
+        },
+      ]);
+      setSaveState("unsaved");
+    } catch (error) {
+      console.error("Could not upload project photo:", error);
+      setPhotoError(
+        error instanceof Error
+          ? error.message
+          : t("aiScan.errors.uploadFailed"),
+      );
+    } finally {
+      setUploadingCategory(null);
+    }
+  };
+
+  const handlePhotoRemove = async (
+    category: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const photo = uploadedPhotos.find(
+      (item) => item.category === category,
+    );
+
+    if (!photo) return;
+
+    setPhotoError(null);
+
+    try {
+      if (photo.path) {
+        const { error } = await supabase.storage
+          .from("project-photos")
+          .remove([photo.path]);
+
+        if (error) throw error;
+      }
+
+      if (photo.previewUrl) {
+        URL.revokeObjectURL(photo.previewUrl);
+      }
+
+      setUploadedPhotos((previous) =>
+        previous.filter((item) => item.category !== category),
+      );
+
+      setSaveState("unsaved");
+    } catch (error) {
+      console.error("Could not remove project photo:", error);
+
+      setPhotoError(
+        error instanceof Error
+          ? error.message
+          : t("aiScan.errors.removeFailed"),
+      );
+    }
+  };
+
+  const persistScan = async ({
+    step,
+    scanStatus = "in_progress",
+    finalAnalysis = false,
+  }: {
+    step: number;
+    scanStatus?: "in_progress" | "completed";
+    finalAnalysis?: boolean;
+  }) => {
+    setSaveState("saving");
+    saveLocalDraft(step, scanStatus);
+
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const user = userData.user;
+
+    if (userError || !user) {
+      setSaveState("local");
+      return {
+        success: true,
+        savedToAccount: false,
+      };
+    }
+
+    const constructionYear = parseNumericValue(form.yearBuilt);
+    const floorArea = parseNumericValue(form.floorArea);
+    const gasUsage = parseNumericValue(form.gasUsage);
+    const electricityUsage = parseNumericValue(form.electricityUsage);
+
+    const analysis = calculateAnalysis();
+
+    const payload = {
+      project_name: projectNameFromForm(),
+      property_type: form.propertyType || null,
+      construction_year:
+        constructionYear === null ? null : Math.round(constructionYear),
+      postal_code: form.postalCode || null,
+      city: form.city || null,
+      floor_area: floorArea === null ? null : Math.round(floorArea),
+      current_energy_label: form.energyLabel || null,
+      annual_energy_cost: null,
+      heating_type: null,
+      renovation_goal:
+        form.goals.length > 0 ? form.goals.join(", ") : null,
+      budget: null,
+      street_address: form.address || null,
+      annual_gas_usage: gasUsage,
+      annual_electricity_usage: electricityUsage,
+      scan_step: step,
+      scan_status: scanStatus,
+      updated_at: new Date().toISOString(),
+      photo_categories: uploadedPhotos.map(({ category, path, fileName }) => ({
+        category,
+        path,
+        fileName,
+      })),
+      status: finalAnalysis
+        ? "AI analysis completed"
+        : "AI Home Scan in progress",
+      target_energy_label: finalAnalysis ? analysis.targetEnergyLabel : null,
+      annual_saving: finalAnalysis ? analysis.annualSaving : null,
+      ai_score: finalAnalysis ? analysis.confidence : null,
+      co2_reduction: finalAnalysis ? analysis.co2Reduction : null,
+      progress: finalAnalysis
+        ? 100
+        : Math.round(((step - 1) / (steps.length - 1)) * 100),
+      next_action: finalAnalysis
+        ? "Review AI renovation recommendations"
+        : "Continue AI Home Scan",
+      roi: null,
+    };
+
+    if (projectId) {
+      const { error } = await supabase
+        .from("Projects")
+        .update(payload)
+        .eq("id", projectId)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Could not update AI Scan:", error);
+        setSaveState("unsaved");
+        window.alert(
+          t("aiScan.errors.syncFailed"),
+        );
+        return {
+          success: false,
+          savedToAccount: false,
+        };
+      }
+    } else {
+      const { data, error } = await supabase
+        .from("Projects")
+        .insert({
+          ...payload,
+          user_id: user.id,
+        })
+        .select("id")
+        .single();
+
+      if (error || !data) {
+        console.error("Could not create AI Scan project:", error);
+        setSaveState("unsaved");
+        window.alert(
+          t("aiScan.errors.syncFailed"),
+        );
+        return {
+          success: false,
+          savedToAccount: false,
+        };
+      }
+
+      setProjectId(data.id);
+      localStorage.setItem(
+        "bouwiser_active_scan_project_id",
+        String(data.id),
+      );
+    }
+
+    if (finalAnalysis) {
+      const latestScan = {
+        id: projectId,
+        createdAt: new Date().toISOString(),
+        projectName: projectNameFromForm(),
+        address: form.address,
+        city: form.city,
+        postalCode: form.postalCode,
+        propertyType: form.propertyType,
+        yearBuilt: form.yearBuilt,
+        floorArea: form.floorArea,
+        energyLabel: form.energyLabel,
+        gasUsage: form.gasUsage,
+        electricityUsage: form.electricityUsage,
+        goals: form.goals,
+        uploadedPhotos: uploadedPhotos.map(
+          ({ category, path, fileName }) => ({
+            category,
+            path,
+            fileName,
+          }),
+        ),
+        analysis: {
+          confidence: analysis.confidence,
+          targetEnergyLabel: analysis.targetEnergyLabel,
+          annualSaving: analysis.annualSaving,
+          co2Reduction: analysis.co2Reduction,
+        },
+        status: "AI analysis completed",
+        progress: 100,
+      };
+
+      localStorage.setItem(
+        "bouwiser_latest_scan",
+        JSON.stringify(latestScan),
+      );
+      localStorage.removeItem("bouwiser_scan_draft");
+      localStorage.removeItem("bouwiser_active_scan_project_id");
+    }
+
+    setSaveState("saved");
+
+    return {
+      success: true,
+      savedToAccount: true,
+    };
+  };
+
+  const goNext = async () => {
+    if (currentStep >= 5 || saveState === "saving") return;
+
+    const nextStep = currentStep + 1;
+    await persistScan({
+      step: nextStep,
+      scanStatus: "in_progress",
+    });
+
+    setCurrentStep(nextStep);
   };
 
   const goBack = () => {
@@ -221,107 +838,42 @@ export default function AIScan() {
     navigate("/");
   };
 
-  const saveScanProject = async () => {
-    const projectName =
-      form.address || form.city
-        ? `${form.address || "Home"} - ${form.city || ""}`.trim()
-        : "My Renovation Project";
+  const handleSaveAndExit = async () => {
+    if (saveState === "saving") return;
 
-    const scanProject = {
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      projectName,
-      address: form.address,
-      city: form.city,
-      postalCode: form.postalCode,
-      propertyType: form.propertyType,
-      yearBuilt: form.yearBuilt,
-      floorArea: form.floorArea,
-      energyLabel: form.energyLabel,
-      gasUsage: form.gasUsage,
-      electricityUsage: form.electricityUsage,
-      goals: form.goals,
-      uploadedPhotos,
-      analysis: {
-        confidence: 87,
-        targetEnergyLabel: "B",
-        annualSaving: 980,
-        co2Reduction: 31,
-      },
-      status: "AI analysis completed",
-      progress: 100,
-    };
+    const result = await persistScan({
+      step: currentStep,
+      scanStatus: "in_progress",
+    });
 
-    // Keep the current prototype flow working even if the database request fails.
-    localStorage.setItem(
-      "bouwiser_latest_scan",
-      JSON.stringify(scanProject),
-    );
-
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !userData.user) {
-      console.error("Could not identify the signed-in user:", userError);
-      window.alert(
-        "Your scan is saved in this browser, but it could not be saved to your account. Please sign in again.",
-      );
-      return false;
+    if (result.savedToAccount) {
+      navigate("/dashboard");
+      return;
     }
 
-    const constructionYear = Number.parseInt(form.yearBuilt.replace(/[^\d]/g, ""), 10);
-    const floorArea = Number.parseInt(form.floorArea.replace(/[^\d]/g, ""), 10);
-
-    const { data: insertedProject, error: insertError } = await supabase
-      .from("Projects")
-      .insert({
-        user_id: userData.user.id,
-        project_name: projectName,
-        property_type: form.propertyType || null,
-        construction_year: Number.isNaN(constructionYear) ? null : constructionYear,
-        postal_code: form.postalCode || null,
-        city: form.city || null,
-        floor_area: Number.isNaN(floorArea) ? null : floorArea,
-        current_energy_label: form.energyLabel || null,
-        annual_energy_cost: null,
-        heating_type: null,
-        renovation_goal: form.goals.length > 0 ? form.goals.join(", ") : null,
-        budget: null,
-        status: "AI analysis completed",
-        target_energy_label: "B",
-        annual_saving: 980,
-        ai_score: 87,
-        co2_reduction: 31,
-        progress: 100,
-        next_action: "Review AI renovation recommendations",
-        roi: null,
-      })
-      .select("id, created_at")
-      .single();
-
-    if (insertError) {
-      console.error("Could not save the project to Supabase:", insertError);
-      window.alert(
-        "Your scan is saved in this browser, but the database save failed. Please try again.",
-      );
-      return false;
-    }
-
-    const syncedScanProject = {
-      ...scanProject,
-      id: insertedProject.id,
-      createdAt: insertedProject.created_at ?? scanProject.createdAt,
-    };
-
-    localStorage.setItem(
-      "bouwiser_latest_scan",
-      JSON.stringify(syncedScanProject),
+    window.alert(
+      t("aiScan.localSaveNotice"),
     );
-
-    return true;
+    navigate("/");
   };
 
-  const startAnalysis = () => {
+  const saveScanProject = async () => {
+    const result = await persistScan({
+      step: 5,
+      scanStatus: "completed",
+      finalAnalysis: true,
+    });
+
+    return result.savedToAccount;
+  };
+
+  const startAnalysis = async () => {
     if (analysisStarted) return;
+
+    await persistScan({
+      step: 5,
+      scanStatus: "in_progress",
+    });
 
     setAnalysisStarted(true);
     setAnalysisProgress(0);
@@ -354,43 +906,64 @@ export default function AIScan() {
 
             <div className="text-left">
               <p className="text-xl font-black tracking-[-0.03em]">Bouwiser</p>
-              <p className="text-xs font-medium text-slate-500">AI Home Scan</p>
+              <p className="text-xs font-medium text-slate-500">{t("aiScan.name")}</p>
             </div>
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 sm:flex">
+            <div
+              className={`hidden items-center gap-2 rounded-full px-3 py-2 text-xs font-bold sm:flex ${
+                saveState === "unsaved"
+                  ? "bg-amber-50 text-amber-700"
+                  : saveState === "saving"
+                    ? "bg-blue-50 text-blue-700"
+                    : saveState === "local"
+                      ? "bg-slate-100 text-slate-600"
+                      : "bg-emerald-50 text-emerald-700"
+              }`}
+            >
               <ShieldCheck className="h-4 w-4" />
-              Progress saved
+              {saveState === "unsaved"
+                ? t("aiScan.save.unsaved")
+                : saveState === "saving"
+                  ? t("aiScan.save.saving")
+                  : saveState === "local"
+                    ? t("aiScan.save.local")
+                    : t("aiScan.save.saved")}
             </div>
 
             <button
               type="button"
-              onClick={() => navigate("/dashboard")}
+              onClick={handleSaveAndExit}
               className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-200 hover:text-orange-600"
             >
-              Save and exit
+              {t("aiScan.saveAndExit")}
             </button>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-[1480px] px-6 py-8 lg:px-10 lg:py-10">
+        {isLoadingDraft && (
+          <div className="mb-6 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-bold text-slate-600 shadow-sm">
+            <LoaderCircle className="h-5 w-5 animate-spin text-orange-500" />
+            {t("aiScan.loadingDraft")}
+          </div>
+        )}
         <section className="overflow-hidden rounded-[36px] border border-slate-200/80 bg-white/95 shadow-[0_30px_100px_rgba(15,23,42,0.08)] backdrop-blur">
           <div className="grid gap-0 lg:grid-cols-[1fr_290px]">
             <div className="p-7 lg:p-10">
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-bold text-orange-700">
                 <Sparkles className="h-4 w-4" />
-                Personalized AI assessment
+                {t("aiScan.hero.badge")}
               </div>
 
               <h1 className="mt-5 max-w-3xl text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-                Analyse your home in five simple steps
+                {t("aiScan.hero.title")}
               </h1>
 
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-500">
-                Tell us about your home, energy usage and renovation goals.
-                Bouwiser will prepare a personalized improvement roadmap.
+                {t("aiScan.hero.description")}
               </p>
             </div>
 
@@ -399,7 +972,7 @@ export default function AIScan() {
 
               <div className="relative">
                 <p className="text-sm font-semibold text-slate-400">
-                  Overall progress
+                  {t("aiScan.overallProgress")}
                 </p>
 
                 <div className="mt-3 flex items-end justify-between">
@@ -421,7 +994,7 @@ export default function AIScan() {
                 </div>
 
                 <p className="mt-4 text-sm leading-6 text-slate-400">
-                  Step {currentStep} of {steps.length}
+                  {t("aiScan.stepOf", { current: currentStep, total: steps.length })}
                 </p>
               </div>
             </div>
@@ -469,9 +1042,9 @@ export default function AIScan() {
                       </div>
 
                       <div className="min-w-0">
-                        <p className="text-sm font-black">{step.title}</p>
+                        <p className="text-sm font-black">{t(step.titleKey)}</p>
                         <p className="mt-0.5 truncate text-xs text-slate-500">
-                          {step.description}
+                          {t(step.descriptionKey)}
                         </p>
                       </div>
                     </div>
@@ -496,14 +1069,14 @@ export default function AIScan() {
                 <div>
                   <SectionHeader
                     icon={Home}
-                    eyebrow="Step 1"
-                    title="Tell us about your property"
-                    description="Provide the basic information needed to create your home profile."
+                    eyebrow={t("aiScan.stepLabels.step1")}
+                    title={t("aiScan.property.title")}
+                    description={t("aiScan.property.description")}
                   />
 
                   <div className="mt-8 grid gap-5 md:grid-cols-2">
                     <InputField
-                      label="Street address"
+                      label={t("aiScan.property.streetAddress")}
                       placeholder="Laan van Meerdervoort 120"
                       icon={MapPin}
                       value={form.address}
@@ -511,15 +1084,15 @@ export default function AIScan() {
                     />
 
                     <InputField
-                      label="City"
-                      placeholder="The Hague"
+                      label={t("aiScan.property.city")}
+                      placeholder={t("aiScan.property.cityPlaceholder")}
                       icon={MapPin}
                       value={form.city}
                       onChange={(value) => updateField("city", value)}
                     />
 
                     <InputField
-                      label="Postal code"
+                      label={t("aiScan.property.postalCode")}
                       placeholder="2517 AN"
                       icon={MapPin}
                       value={form.postalCode}
@@ -527,7 +1100,7 @@ export default function AIScan() {
                     />
 
                     <InputField
-                      label="Year built"
+                      label={t("aiScan.property.yearBuilt")}
                       placeholder="1998"
                       icon={Building2}
                       value={form.yearBuilt}
@@ -535,7 +1108,7 @@ export default function AIScan() {
                     />
 
                     <InputField
-                      label="Floor area"
+                      label={t("aiScan.property.floorArea")}
                       placeholder="164 m²"
                       icon={Ruler}
                       value={form.floorArea}
@@ -545,7 +1118,7 @@ export default function AIScan() {
 
                   <div className="mt-9">
                     <p className="text-sm font-black text-slate-900">
-                      Property type
+                      {t("aiScan.property.propertyType")}
                     </p>
 
                     <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -576,7 +1149,7 @@ export default function AIScan() {
                               <Icon className="h-6 w-6" />
                             </div>
 
-                            <p className="mt-4 font-black">{type.label}</p>
+                            <p className="mt-4 font-black">{t(`aiScan.propertyTypes.${type.label}`)}</p>
                           </button>
                         );
                       })}
@@ -589,56 +1162,123 @@ export default function AIScan() {
                 <div>
                   <SectionHeader
                     icon={ImagePlus}
-                    eyebrow="Step 2"
-                    title="Upload property photos"
-                    description="Clear photos help the AI identify renovation opportunities more accurately."
+                    eyebrow={t("aiScan.stepLabels.step2")}
+                    title={t("aiScan.photos.title")}
+                    description={t("aiScan.photos.description")}
                   />
 
                   <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {photoCategories.map((category) => {
-                      const isUploaded = uploadedPhotos.includes(category);
+                    {photoCategories.map(({ value: category, key: categoryKey }) => {
+                      const photo = uploadedPhotos.find(
+                        (item) => item.category === category,
+                      );
+                      const isUploading = uploadingCategory === category;
+                      const inputId = `photo-${category
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")}`;
 
                       return (
-                        <button
+                        <label
                           key={category}
-                          type="button"
-                          onClick={() => togglePhoto(category)}
-                          className={`group flex min-h-52 flex-col items-center justify-center rounded-[26px] border-2 border-dashed p-6 text-center transition-all duration-300 ${
-                            isUploaded
+                          htmlFor={inputId}
+                          className={`group relative flex min-h-52 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[26px] border-2 border-dashed p-6 text-center transition-all duration-300 ${
+                            photo
                               ? "border-emerald-400 bg-emerald-50"
                               : "border-slate-200 bg-slate-50 hover:-translate-y-1 hover:border-orange-300 hover:bg-orange-50"
                           }`}
                         >
-                          <div
-                            className={`flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm ${
-                              isUploaded
-                                ? "bg-emerald-500 text-white"
-                                : "bg-white text-orange-500"
-                            }`}
-                          >
-                            {isUploaded ? (
-                              <CheckCircle2 className="h-7 w-7" />
-                            ) : (
-                              <Upload className="h-7 w-7" />
-                            )}
+                          {photo?.previewUrl && (
+                            <img
+                              src={photo.previewUrl}
+                              alt={category}
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
+                          )}
+
+                          {photo?.previewUrl && (
+                            <div className="absolute inset-0 bg-slate-950/45" />
+                          )}
+
+                          {photo && (
+                            <button
+                              type="button"
+                              onClick={(event) =>
+                                void handlePhotoRemove(category, event)
+                              }
+                              className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-xl bg-white/95 text-red-500 shadow-lg transition hover:bg-red-500 hover:text-white"
+                              title={t("aiScan.photos.removePhoto")}
+                              aria-label={`Remove ${category} photo`}
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          )}
+
+                          <input
+                            id={inputId}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                            className="sr-only"
+                            disabled={Boolean(uploadingCategory)}
+                            onChange={(event) => {
+                              const file = event.target.files?.[0];
+                              void handlePhotoUpload(category, file);
+                              event.currentTarget.value = "";
+                            }}
+                          />
+
+                          <div className="relative z-10">
+                            <div
+                              className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm ${
+                                photo
+                                  ? "bg-emerald-500 text-white"
+                                  : "bg-white text-orange-500"
+                              }`}
+                            >
+                              {isUploading ? (
+                                <LoaderCircle className="h-7 w-7 animate-spin" />
+                              ) : photo ? (
+                                <CheckCircle2 className="h-7 w-7" />
+                              ) : (
+                                <Upload className="h-7 w-7" />
+                              )}
+                            </div>
+
+                            <p
+                              className={`mt-4 font-black ${
+                                photo?.previewUrl ? "text-white" : ""
+                              }`}
+                            >
+                              {t(categoryKey)}
+                            </p>
+
+                            <p
+                              className={`mt-2 text-sm ${
+                                photo?.previewUrl
+                                  ? "text-white/90"
+                                  : "text-slate-500"
+                              }`}
+                            >
+                              {isUploading
+                                ? t("aiScan.photos.uploading")
+                                : photo
+                                  ? t("aiScan.photos.uploadedReplace")
+                                  : t("aiScan.photos.choosePhoto")}
+                            </p>
                           </div>
-
-                          <p className="mt-4 font-black">{category}</p>
-
-                          <p className="mt-2 text-sm text-slate-500">
-                            {isUploaded
-                              ? "Photo uploaded"
-                              : "Click to simulate upload"}
-                          </p>
-                        </button>
+                        </label>
                       );
                     })}
                   </div>
 
+                  {photoError && (
+                    <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                      {photoError}
+                    </div>
+                  )}
+
                   <div className="mt-6 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-blue-700">
                     <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
-                    Uploading real files will be enabled when the backend and
-                    cloud storage are connected.
+                    {t("aiScan.photos.privacy")}
                   </div>
                 </div>
               )}
@@ -647,15 +1287,15 @@ export default function AIScan() {
                 <div>
                   <SectionHeader
                     icon={Zap}
-                    eyebrow="Step 3"
-                    title="Add your energy information"
-                    description="Energy usage helps Bouwiser estimate savings and improvement potential."
+                    eyebrow={t("aiScan.stepLabels.step3")}
+                    title={t("aiScan.energy.title")}
+                    description={t("aiScan.energy.description")}
                   />
 
                   <div className="mt-8 grid gap-5 md:grid-cols-2">
                     <label className="block">
                       <span className="text-sm font-black text-slate-900">
-                        Current energy label
+                        {t("aiScan.energy.currentLabel")}
                       </span>
 
                       <select
@@ -665,7 +1305,7 @@ export default function AIScan() {
                         }
                         className="mt-2 h-14 w-full rounded-2xl border border-slate-200 bg-white px-4 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                       >
-                        <option value="">Select energy label</option>
+                        <option value="">{t("aiScan.energy.selectLabel")}</option>
 
                         {[
                           "A+++",
@@ -687,7 +1327,7 @@ export default function AIScan() {
                     </label>
 
                     <InputField
-                      label="Annual gas usage"
+                      label={t("aiScan.energy.annualGas")}
                       placeholder="1,250 m³"
                       icon={Flame}
                       value={form.gasUsage}
@@ -695,7 +1335,7 @@ export default function AIScan() {
                     />
 
                     <InputField
-                      label="Annual electricity usage"
+                      label={t("aiScan.energy.annualElectricity")}
                       placeholder="3,200 kWh"
                       icon={Zap}
                       value={form.electricityUsage}
@@ -713,13 +1353,11 @@ export default function AIScan() {
 
                       <div>
                         <p className="font-black">
-                          Energy bill or certificate
+                          {t("aiScan.energy.billTitle")}
                         </p>
 
                         <p className="mt-2 text-sm leading-6 text-slate-500">
-                          You will later be able to upload an energy bill or
-                          official energy-label certificate for a more accurate
-                          analysis.
+                          {t("aiScan.energy.billDescription")}
                         </p>
                       </div>
                     </div>
@@ -731,9 +1369,9 @@ export default function AIScan() {
                 <div>
                   <SectionHeader
                     icon={Goal}
-                    eyebrow="Step 4"
-                    title="What do you want to achieve?"
-                    description="Select one or more renovation goals so the recommendations match your priorities."
+                    eyebrow={t("aiScan.stepLabels.step4")}
+                    title={t("aiScan.goalsSection.title")}
+                    description={t("aiScan.goalsSection.description")}
                   />
 
                   <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -768,10 +1406,10 @@ export default function AIScan() {
                             )}
                           </div>
 
-                          <p className="mt-5 font-black">{goal.label}</p>
+                          <p className="mt-5 font-black">{t(goal.titleKey)}</p>
 
                           <p className="mt-2 text-sm leading-6 text-slate-500">
-                            {goal.description}
+                            {t(goal.descriptionKey)}
                           </p>
                         </button>
                       );
@@ -794,13 +1432,12 @@ export default function AIScan() {
 
                       <h2 className="mt-7 text-4xl font-black tracking-[-0.03em]">
                         {analysisStarted
-                          ? "Bouwiser is analysing your home"
-                          : "Ready to start your AI analysis"}
+                          ? t("aiScan.analysis.analysingTitle")
+                          : t("aiScan.analysis.readyTitle")}
                       </h2>
 
                       <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-500">
-                        Our AI will evaluate your property profile, energy usage,
-                        photos and renovation objectives.
+                        {t("aiScan.analysis.description")}
                       </p>
 
                       {analysisStarted && (
@@ -808,7 +1445,7 @@ export default function AIScan() {
                           <div className="mx-auto mt-8 max-w-xl">
                             <div className="flex justify-between text-sm">
                               <span className="font-bold text-slate-600">
-                                Analysis progress
+                                {t("aiScan.analysis.progress")}
                               </span>
 
                               <span className="font-black text-orange-500">
@@ -852,7 +1489,7 @@ export default function AIScan() {
                                   </div>
 
                                   <span className="text-sm font-bold">
-                                    {item}
+                                    {t(item)}
                                   </span>
                                 </div>
                               );
@@ -868,7 +1505,7 @@ export default function AIScan() {
                           className="mt-8 inline-flex h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-8 font-black text-white shadow-xl shadow-orange-500/25 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02]"
                         >
                           <Sparkles className="h-5 w-5" />
-                          Start AI Analysis
+                          {t("aiScan.analysis.start")}
                         </button>
                       )}
                     </div>
@@ -879,37 +1516,36 @@ export default function AIScan() {
                       </div>
 
                       <p className="mt-7 text-sm font-black uppercase tracking-[0.18em] text-emerald-600">
-                        Analysis complete
+                        {t("aiScan.results.complete")}
                       </p>
 
                       <h2 className="mt-3 text-4xl font-black tracking-[-0.03em] sm:text-5xl">
-                        Your AI renovation report is ready
+                        {t("aiScan.results.title")}
                       </h2>
 
                       <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-500">
-                        Bouwiser identified the most promising energy and
-                        renovation opportunities for your home.
+                        {t("aiScan.results.description")}
                       </p>
 
                       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         <ResultCard
-                          label="AI confidence"
-                          value="87%"
+                          label={t("aiScan.results.confidence")}
+                          value={`${analysisResult.confidence}%`}
                           icon={Bot}
                         />
                         <ResultCard
-                          label="Target energy label"
-                          value="B"
+                          label={t("aiScan.results.targetLabel")}
+                          value={analysisResult.targetEnergyLabel}
                           icon={Zap}
                         />
                         <ResultCard
-                          label="Annual saving"
-                          value="€980"
+                          label={t("aiScan.results.annualSaving")}
+                          value={new Intl.NumberFormat(i18n.language?.startsWith("en") ? "en-NL" : "nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(analysisResult.annualSaving)}
                           icon={CircleDollarSign}
                         />
                         <ResultCard
-                          label="CO₂ reduction"
-                          value="31%"
+                          label={t("aiScan.results.co2Reduction")}
+                          value={`${analysisResult.co2Reduction}%`}
                           icon={Leaf}
                         />
                       </div>
@@ -925,7 +1561,7 @@ export default function AIScan() {
                         }}
                         className="mt-8 inline-flex h-14 items-center gap-2 rounded-2xl bg-slate-950 px-9 font-black text-white shadow-xl shadow-slate-950/20 transition-all duration-300 hover:-translate-y-1 hover:bg-orange-500"
                       >
-                        View My Renovation Dashboard
+                        {t("aiScan.results.viewDashboard")}
                         <ArrowRight className="h-5 w-5" />
                       </button>
                     </div>
@@ -943,7 +1579,7 @@ export default function AIScan() {
                 className="inline-flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-100"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back
+                {t("aiScan.back")}
               </button>
 
               <button
@@ -951,7 +1587,7 @@ export default function AIScan() {
                 onClick={goNext}
                 className="inline-flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-7 text-sm font-black text-white shadow-lg shadow-orange-500/20 transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02]"
               >
-                Continue
+                {t("aiScan.continue")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

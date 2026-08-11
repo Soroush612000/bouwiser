@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   CalendarDays,
@@ -59,8 +60,8 @@ type DisplayProject = {
   co2Reduction: number;
 };
 
-function formatEuro(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
+function formatEuro(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -109,7 +110,7 @@ function normalizeProject(project: SupabaseProject): DisplayProject {
     progress: Math.min(100, Math.max(0, Number(project.progress ?? 0))),
     budgetValue,
     budgetDisplay:
-      budgetValue > 0 ? formatEuro(budgetValue) : "To be estimated",
+      budgetValue > 0 ? String(budgetValue) : "To be estimated",
     annualSaving,
     roi: project.roi?.trim() || "To be estimated",
     nextAction:
@@ -122,11 +123,61 @@ function normalizeProject(project: SupabaseProject): DisplayProject {
 
 export default function MyProjects() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const numberLocale =
+    i18n.language?.startsWith("en") ? "en-NL" : "nl-NL";
+
+  const translateKnownValue = (value: string) => {
+    const knownValues: Record<string, string> = {
+      Home: t("myProjects.values.home"),
+      Woning: t("myProjects.values.home"),
+
+      "Unknown city": t("myProjects.values.unknownCity"),
+      "Onbekende plaats": t("myProjects.values.unknownCity"),
+
+      "My Renovation Project": t("myProjects.values.defaultProjectName"),
+      "Mijn renovatieproject": t("myProjects.values.defaultProjectName"),
+
+      "AI analysis completed": t("myProjects.values.aiAnalysisCompleted"),
+      "AI-analyse voltooid": t("myProjects.values.aiAnalysisCompleted"),
+
+      "AI Home Scan in progress": t("myProjects.values.aiScanInProgress"),
+      "AI-woningscan bezig": t("myProjects.values.aiScanInProgress"),
+
+      "Continue AI Home Scan": t("myProjects.values.continueAiScan"),
+      "Ga verder met AI-woningscan": t("myProjects.values.continueAiScan"),
+
+      "To be estimated": t("myProjects.values.toBeEstimated"),
+      "Nog te bepalen": t("myProjects.values.toBeEstimated"),
+
+      "Review AI renovation recommendations": t(
+        "myProjects.values.reviewRecommendations",
+      ),
+      "Bekijk de AI-renovatieaanbevelingen": t(
+        "myProjects.values.reviewRecommendations",
+      ),
+
+      "Detached house": t("myProjects.propertyTypes.detached"),
+      "Vrijstaande woning": t("myProjects.propertyTypes.detached"),
+
+      "Semi-detached house": t("myProjects.propertyTypes.semiDetached"),
+      "Twee-onder-een-kapwoning": t("myProjects.propertyTypes.semiDetached"),
+
+      "Terraced house": t("myProjects.propertyTypes.terraced"),
+      "Rijtjeswoning": t("myProjects.propertyTypes.terraced"),
+
+      Apartment: t("myProjects.propertyTypes.apartment"),
+      Appartement: t("myProjects.propertyTypes.apartment"),
+    };
+
+    return knownValues[value] ?? value;
+  };
 
   const [activeItem, setActiveItem] = useState("projects");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [userName, setUserName] = useState("Homeowner");
+  const [userName, setUserName] = useState(() => t("myProjects.homeowner"));
   const [userInitial, setUserInitial] = useState("H");
 
   const [authLoading, setAuthLoading] = useState(true);
@@ -153,7 +204,7 @@ export default function MyProjects() {
       if (error) {
         console.error("Could not load Bouwiser projects:", error);
         setProjects([]);
-        setLoadError("We could not load your projects.");
+        setLoadError("myProjects.loadErrorMessage");
         setProjectsLoading(false);
         return;
       }
@@ -176,10 +227,15 @@ export default function MyProjects() {
         return;
       }
 
-      const displayName = getDisplayName(
+      const rawDisplayName = getDisplayName(
         session.user.user_metadata?.full_name,
         session.user.email,
       );
+
+      const displayName =
+        rawDisplayName === "Homeowner"
+          ? t("myProjects.homeowner")
+          : rawDisplayName;
 
       setUserName(displayName);
       setUserInitial(getInitial(displayName));
@@ -219,7 +275,7 @@ export default function MyProjects() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, t]);
 
   const filteredProjects = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -276,7 +332,7 @@ export default function MyProjects() {
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
 
           <p className="mt-4 text-sm font-semibold text-slate-600">
-            Loading your Bouwiser projects...
+            {t("myProjects.authLoading")}
           </p>
         </div>
       </div>
@@ -300,15 +356,15 @@ export default function MyProjects() {
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">
-              Project management
+              {t("myProjects.eyebrow")}
             </p>
 
             <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">
-              My Projects
+              {t("myProjects.title")}
             </h1>
 
             <p className="mt-2 text-slate-500">
-              Track renovation progress, budgets and energy improvements.
+              {t("myProjects.description")}
             </p>
           </div>
 
@@ -318,34 +374,34 @@ export default function MyProjects() {
             className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
           >
             <Plus className="h-5 w-5" />
-            New Project
+            {t("myProjects.newProject")}
           </button>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {[
             [
-              "Total projects",
+              t("myProjects.stats.totalProjects"),
               String(projects.length),
-              "All renovation projects",
+              t("myProjects.stats.allProjects"),
               "text-emerald-600",
             ],
             [
-              "Active projects",
+              t("myProjects.stats.activeProjects"),
               String(activeProjects),
-              "Currently progressing",
+              t("myProjects.stats.currentlyProgressing"),
               "text-orange-600",
             ],
             [
-              "Total investment",
-              formatEuro(totalInvestment),
-              "Planned project budget",
+              t("myProjects.stats.totalInvestment"),
+              formatEuro(totalInvestment, numberLocale),
+              t("myProjects.stats.plannedBudget"),
               "text-slate-500",
             ],
             [
-              "Estimated savings",
-              formatEuro(totalSavings),
-              "Per year",
+              t("myProjects.stats.estimatedSavings"),
+              formatEuro(totalSavings, numberLocale),
+              t("myProjects.stats.perYear"),
               "text-emerald-600",
             ],
           ].map(([label, value, note, noteClass]) => (
@@ -372,11 +428,11 @@ export default function MyProjects() {
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
             <div>
               <h2 className="text-2xl font-black text-slate-950">
-                Renovation projects
+                {t("myProjects.sectionTitle")}
               </h2>
 
               <p className="mt-1 text-sm text-slate-500">
-                View and manage all renovation plans.
+                {t("myProjects.sectionDescription")}
               </p>
             </div>
 
@@ -390,7 +446,7 @@ export default function MyProjects() {
                   onChange={(event) =>
                     setSearchQuery(event.target.value)
                   }
-                  placeholder="Search projects..."
+                  placeholder={t("myProjects.searchPlaceholder")}
                   className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 pr-4 outline-none transition focus:border-orange-500 focus:bg-white sm:w-72"
                 />
               </div>
@@ -400,7 +456,7 @@ export default function MyProjects() {
                 className="flex h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
               >
                 <Filter className="h-5 w-5" />
-                Filter
+                {t("myProjects.filter")}
               </button>
             </div>
           </div>
@@ -410,17 +466,17 @@ export default function MyProjects() {
               <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
 
               <p className="mt-4 text-sm font-semibold text-slate-500">
-                Loading projects from Bouwiser...
+                {t("myProjects.projectsLoading")}
               </p>
             </div>
           ) : loadError ? (
             <div className="py-16 text-center">
               <p className="text-lg font-black text-slate-950">
-                Could not load projects
+                {t("myProjects.loadErrorTitle")}
               </p>
 
               <p className="mt-2 text-sm text-slate-500">
-                {loadError}
+                {t(loadError)}
               </p>
             </div>
           ) : (
@@ -439,18 +495,18 @@ export default function MyProjects() {
 
                         <div>
                           <h3 className="text-xl font-black text-slate-950">
-                            {project.name}
+                            {translateKnownValue(project.name)}
                           </h3>
 
                           <p className="mt-1 text-sm text-slate-500">
-                            {project.propertyType} · {project.city}
+                            {translateKnownValue(project.propertyType)} · {translateKnownValue(project.city)}
                           </p>
                         </div>
                       </div>
 
                       <button
                         type="button"
-                        aria-label="Project options"
+                        aria-label={t("myProjects.projectOptions")}
                         className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                       >
                         <MoreHorizontal className="h-5 w-5" />
@@ -459,17 +515,17 @@ export default function MyProjects() {
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
-                        {project.status}
+                        {translateKnownValue(project.status)}
                       </span>
 
                       <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                        Label {project.currentEnergyLabel} →{" "}
+                        {t("myProjects.energyLabel")} {project.currentEnergyLabel} →{" "}
                         {project.targetEnergyLabel}
                       </span>
 
                       {project.aiScore > 0 && (
                         <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-700">
-                          AI Score {project.aiScore}%
+                          {t("myProjects.aiScore")} {project.aiScore}%
                         </span>
                       )}
                     </div>
@@ -477,7 +533,7 @@ export default function MyProjects() {
                     <div className="mt-6">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-500">
-                          Project progress
+                          {t("myProjects.projectProgress")}
                         </span>
 
                         <span className="font-black text-slate-950">
@@ -501,12 +557,14 @@ export default function MyProjects() {
                           <Euro className="h-4 w-4" />
 
                           <span className="text-xs font-semibold">
-                            Budget
+                            {t("myProjects.budget")}
                           </span>
                         </div>
 
                         <p className="mt-2 font-black text-slate-950">
-                          {project.budgetDisplay}
+                          {project.budgetValue > 0
+                            ? formatEuro(project.budgetValue, numberLocale)
+                            : t("myProjects.values.toBeEstimated")}
                         </p>
                       </div>
 
@@ -515,12 +573,12 @@ export default function MyProjects() {
                           <CalendarDays className="h-4 w-4" />
 
                           <span className="text-xs font-semibold">
-                            Payback
+                            {t("myProjects.payback")}
                           </span>
                         </div>
 
                         <p className="mt-2 font-black text-slate-950">
-                          {project.roi}
+                          {translateKnownValue(project.roi)}
                         </p>
                       </div>
                     </div>
@@ -530,12 +588,12 @@ export default function MyProjects() {
                         <Zap className="h-4 w-4" />
 
                         <span className="text-xs font-bold uppercase tracking-wide">
-                          Next action
+                          {t("myProjects.nextAction")}
                         </span>
                       </div>
 
                       <p className="mt-2 font-bold text-emerald-950">
-                        {project.nextAction}
+                        {translateKnownValue(project.nextAction)}
                       </p>
                     </div>
 
@@ -546,7 +604,7 @@ export default function MyProjects() {
                       }
                       className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-500"
                     >
-                      Open Project
+                      {t("myProjects.openProject")}
                       <ArrowRight className="h-4 w-4" />
                     </button>
                   </article>
@@ -557,14 +615,14 @@ export default function MyProjects() {
                 <div className="py-16 text-center">
                   <p className="text-lg font-black text-slate-950">
                     {projects.length === 0
-                      ? "No projects yet"
-                      : "No projects found"}
+                      ? t("myProjects.empty.noProjectsYet")
+                      : t("myProjects.empty.noProjectsFound")}
                   </p>
 
                   <p className="mt-2 text-sm text-slate-500">
                     {projects.length === 0
-                      ? "Start your first AI Home Scan to create a renovation project."
-                      : "Try a different project name, city or property type."}
+                      ? t("myProjects.empty.startFirstScan")
+                      : t("myProjects.empty.tryDifferentSearch")}
                   </p>
 
                   {projects.length === 0 && (
@@ -574,7 +632,7 @@ export default function MyProjects() {
                       className="mt-5 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
                     >
                       <Plus className="h-4 w-4" />
-                      Start AI Home Scan
+                      {t("myProjects.startScan")}
                     </button>
                   )}
                 </div>

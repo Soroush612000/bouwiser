@@ -5,6 +5,7 @@ import {
   Sparkles,
   TrendingUp,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type {
   ProjectData,
@@ -46,6 +47,56 @@ function getStatusStyle(
 export default function AIRecommendations({
   project,
 }: AIRecommendationsProps) {
+  const { t } = useTranslation();
+
+  const translateKnownValue = (value: string) => {
+    const knownValues: Record<string, string> = {
+      "Roof insulation": t("aiRecommendations.items.roofInsulation"),
+      Dakisolatie: t("aiRecommendations.items.roofInsulation"),
+
+      "Triple glazing": t("aiRecommendations.items.tripleGlazing"),
+      "Driedubbel glas": t("aiRecommendations.items.tripleGlazing"),
+
+      "Hybrid heat pump": t("aiRecommendations.items.hybridHeatPump"),
+      "Hybride warmtepomp": t("aiRecommendations.items.hybridHeatPump"),
+
+      "Solar panels": t("aiRecommendations.items.solarPanels"),
+      Zonnepanelen: t("aiRecommendations.items.solarPanels"),
+
+      Insulation: t("aiRecommendations.categories.insulation"),
+      Isolatie: t("aiRecommendations.categories.insulation"),
+
+      Windows: t("aiRecommendations.categories.windows"),
+      Ramen: t("aiRecommendations.categories.windows"),
+
+      Heating: t("aiRecommendations.categories.heating"),
+      Verwarming: t("aiRecommendations.categories.heating"),
+
+      Solar: t("aiRecommendations.categories.solar"),
+      Zonneenergie: t("aiRecommendations.categories.solar"),
+
+      Completed: t("aiRecommendations.status.completed"),
+      Voltooid: t("aiRecommendations.status.completed"),
+
+      Planned: t("aiRecommendations.status.planned"),
+      Gepland: t("aiRecommendations.status.planned"),
+
+      Recommended: t("aiRecommendations.status.recommended"),
+      Aanbevolen: t("aiRecommendations.status.recommended"),
+
+      High: t("aiRecommendations.priority.high"),
+      Hoog: t("aiRecommendations.priority.high"),
+
+      Medium: t("aiRecommendations.priority.medium"),
+      Gemiddeld: t("aiRecommendations.priority.medium"),
+
+      Low: t("aiRecommendations.priority.low"),
+      Laag: t("aiRecommendations.priority.low"),
+    };
+
+    return knownValues[value] ?? value;
+  };
+
   return (
     <section className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
       <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-start">
@@ -54,17 +105,16 @@ export default function AIRecommendations({
             <Sparkles className="h-5 w-5" />
 
             <p className="text-sm font-bold uppercase tracking-[0.16em]">
-              AI recommendations
+              {t("aiRecommendations.eyebrow")}
             </p>
           </div>
 
           <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-            Best upgrades for this home
+            {t("aiRecommendations.title")}
           </h2>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-            Recommendations are ranked using estimated investment, annual
-            energy savings and expected payback period.
+            {t("aiRecommendations.description")}
           </p>
         </div>
 
@@ -72,7 +122,7 @@ export default function AIRecommendations({
           type="button"
           className="flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-bold text-orange-700 transition hover:bg-orange-100"
         >
-          View full AI report
+          {t("aiRecommendations.viewFullReport")}
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
@@ -91,11 +141,11 @@ export default function AIRecommendations({
 
                 <div>
                   <p className="text-sm font-bold text-orange-500">
-                    {recommendation.category}
+                    {translateKnownValue(recommendation.category)}
                   </p>
 
                   <h3 className="mt-1 text-xl font-black text-slate-950">
-                    {recommendation.title}
+                    {translateKnownValue(recommendation.title)}
                   </h3>
                 </div>
               </div>
@@ -106,7 +156,9 @@ export default function AIRecommendations({
                     recommendation.priority,
                   )}`}
                 >
-                  {recommendation.priority} priority
+                  {t("aiRecommendations.priorityLabel", {
+                    priority: translateKnownValue(recommendation.priority),
+                  })}
                 </span>
 
                 <span
@@ -114,7 +166,7 @@ export default function AIRecommendations({
                     recommendation.status,
                   )}`}
                 >
-                  {recommendation.status}
+                  {translateKnownValue(recommendation.status)}
                 </span>
               </div>
             </div>
@@ -123,12 +175,10 @@ export default function AIRecommendations({
               <div className="rounded-2xl bg-slate-50 p-4">
                 <div className="flex items-center gap-2 text-slate-500">
                   <BadgeEuro className="h-4 w-4" />
-
                   <span className="text-xs font-bold uppercase tracking-wide">
-                    Cost
+                    {t("aiRecommendations.cost")}
                   </span>
                 </div>
-
                 <p className="mt-3 text-lg font-black text-slate-950">
                   {recommendation.estimatedCost}
                 </p>
@@ -137,12 +187,10 @@ export default function AIRecommendations({
               <div className="rounded-2xl bg-emerald-50 p-4">
                 <div className="flex items-center gap-2 text-emerald-700">
                   <TrendingUp className="h-4 w-4" />
-
                   <span className="text-xs font-bold uppercase tracking-wide">
-                    Saving
+                    {t("aiRecommendations.saving")}
                   </span>
                 </div>
-
                 <p className="mt-3 text-lg font-black text-emerald-950">
                   {recommendation.annualSaving}
                 </p>
@@ -151,12 +199,10 @@ export default function AIRecommendations({
               <div className="rounded-2xl bg-violet-50 p-4">
                 <div className="flex items-center gap-2 text-violet-700">
                   <Clock3 className="h-4 w-4" />
-
                   <span className="text-xs font-bold uppercase tracking-wide">
-                    Payback
+                    {t("aiRecommendations.payback")}
                   </span>
                 </div>
-
                 <p className="mt-3 text-lg font-black text-violet-950">
                   {recommendation.paybackPeriod}
                 </p>
@@ -181,7 +227,7 @@ export default function AIRecommendations({
               type="button"
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-500"
             >
-              View recommended products
+              {t("aiRecommendations.viewProducts")}
               <ArrowRight className="h-4 w-4" />
             </button>
           </article>

@@ -1,0 +1,36 @@
+{
+    "nav": {
+      "home": "Home",
+      "projects": "My Projects",
+      "marketplace": "Products",
+      "compare": "Compare",
+      "energy": "Energy",
+      "aiAssistant": "AI Assistant",
+      "partners": "Partners",
+      "about": "About",
+      "contact": "Contact",
+      "startScan": "Start AI Scan"
+    },
+    "products": {
+      "browseTitle": "Browse & compare products",
+      "browseDescription": "Compare building products, prices and performance.",
+      "categories": {
+        "insulation": "Insulation",
+        "windows": "Windows",
+        "flooring": "Flooring",
+        "heating": "Heating",
+        "solar": "Solar",
+        "materials": "Materials"
+      }
+    },
+    "comparison": {
+      "title": "Compare smarter.",
+      "description": "Compare products, specifications and retailer prices in one place.",
+      "action": "Explore products"
+    },
+    "common": {
+      "language": "Language",
+      "dutch": "Dutch",
+      "english": "English"
+    }
+  }
