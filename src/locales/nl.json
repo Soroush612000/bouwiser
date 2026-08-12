@@ -9,8 +9,25 @@
       "partners": "Partners",
       "about": "Over ons",
       "contact": "Contact",
-      "startScan": "Start AI-woningscan"
+      "startScan": "Start AI-woningsscan"
     },
+  
+    "aiAssistant": {
+      "badge": "Bouwiser AI-assistent",
+      "title": "Renovatieadvies in één gesprek",
+      "subtitle": "Assistent voor renovatieadvies",
+      "welcomeTitle": "Waarmee kan ik je helpen bij je renovatie?",
+      "welcomeDescription": "Vraag naar renovatieprioriteiten, energieprestaties, producten, duurzaamheid en indicatieve kosten. Ik kan je helpen mogelijke maatregelen te begrijpen, opties te vergelijken en de volgende stappen voor je woning voor te bereiden.",
+      "suggestions": {
+        "first": "Welke renovatie kan ik het beste als eerste doen?",
+        "energyLabel": "Hoe kan ik mijn energielabel verbeteren?",
+        "compareRoof": "Vergelijk opties voor dakisolatie",
+        "subsidies": "Welke subsidies kunnen relevant zijn?"
+      },
+      "placeholder": "Vraag het aan Bouwiser AI...",
+      "send": "Bericht verzenden"
+    },
+  
     "products": {
       "browseTitle": "Bekijk en vergelijk producten",
       "browseDescription": "Vergelijk bouwproducten, prijzen en prestaties.",
@@ -23,11 +40,13 @@
         "materials": "Materialen"
       }
     },
+  
     "comparison": {
       "title": "Vergelijk slimmer.",
       "description": "Vergelijk producten, specificaties en winkelprijzen op één plek.",
       "action": "Bekijk producten"
     },
+  
     "common": {
       "language": "Taal",
       "dutch": "Nederlands",

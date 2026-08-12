@@ -8,54 +8,50 @@ import {
   Store,
   Users,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 
-const partnerTypes = [
-  {
-    title: "Manufacturers",
-    description:
-      "Present building products with clear specifications, performance information and relevant renovation applications.",
-    icon: Factory,
-  },
-  {
-    title: "Suppliers",
-    description:
-      "Help homeowners discover available products and compare suitable options in one structured environment.",
-    icon: Store,
-  },
-  {
-    title: "Renovation professionals",
-    description:
-      "Connect renovation expertise with homeowners who are actively planning improvements to their properties.",
-    icon: Users,
-  },
-];
-
-const benefits = [
-  {
-    title: "Product visibility",
-    description:
-      "Make products easier to discover within relevant renovation categories and homeowner journeys.",
-    icon: PackageSearch,
-  },
-  {
-    title: "Structured comparison",
-    description:
-      "Present product information in a consistent format that helps homeowners understand and compare options.",
-    icon: Network,
-  },
-  {
-    title: "Relevant homeowner connections",
-    description:
-      "Reach homeowners at the moment they are exploring renovation measures, products and next steps.",
-    icon: Handshake,
-  },
-];
-
 export default function Hub() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const partnerTypes = [
+    {
+      title: t("partnersPage.types.manufacturers.title"),
+      description: t("partnersPage.types.manufacturers.description"),
+      icon: Factory,
+    },
+    {
+      title: t("partnersPage.types.suppliers.title"),
+      description: t("partnersPage.types.suppliers.description"),
+      icon: Store,
+    },
+    {
+      title: t("partnersPage.types.professionals.title"),
+      description: t("partnersPage.types.professionals.description"),
+      icon: Users,
+    },
+  ];
+
+  const benefits = [
+    {
+      title: t("partnersPage.benefits.visibility.title"),
+      description: t("partnersPage.benefits.visibility.description"),
+      icon: PackageSearch,
+    },
+    {
+      title: t("partnersPage.benefits.comparison.title"),
+      description: t("partnersPage.benefits.comparison.description"),
+      icon: Network,
+    },
+    {
+      title: t("partnersPage.benefits.connections.title"),
+      description: t("partnersPage.benefits.connections.description"),
+      icon: Handshake,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-white text-slate-950">
@@ -68,20 +64,17 @@ export default function Hub() {
             <div className="max-w-4xl">
               <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#a90f35]">
                 <Handshake className="h-4 w-4" strokeWidth={1.8} />
-                Supplier & partner network
+                {t("partnersPage.hero.eyebrow")}
               </div>
 
               <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.05] tracking-[-0.045em] text-slate-950 sm:text-6xl">
-                Connect renovation products
+                {t("partnersPage.hero.titleLine1")}
                 <br />
-                with homeowners.
+                {t("partnersPage.hero.titleLine2")}
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-                Bouwiser brings manufacturers, suppliers and renovation
-                professionals into one structured environment where homeowners
-                can explore products, understand options and plan their next
-                renovation steps.
+                {t("partnersPage.hero.description")}
               </p>
             </div>
           </div>
@@ -92,17 +85,15 @@ export default function Hub() {
           <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
             <div className="max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a90f35]">
-                Partner network
+                {t("partnersPage.network.eyebrow")}
               </p>
 
               <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-4xl">
-                Built for the renovation ecosystem.
+                {t("partnersPage.network.title")}
               </h2>
 
               <p className="mt-4 text-base leading-7 text-slate-600">
-                Bouwiser is designed to connect the different parties involved
-                in residential renovation through clearer information and a
-                more structured homeowner journey.
+                {t("partnersPage.network.description")}
               </p>
             </div>
 
@@ -143,18 +134,15 @@ export default function Hub() {
                 </div>
 
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#a90f35]">
-                  Why partner with Bouwiser?
+                  {t("partnersPage.value.eyebrow")}
                 </p>
 
                 <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-slate-950 sm:text-4xl">
-                  A clearer route from product information to renovation
-                  decisions.
+                  {t("partnersPage.value.title")}
                 </h2>
 
                 <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
-                  Bouwiser aims to make renovation information more useful for
-                  homeowners while giving industry partners a structured way to
-                  present relevant products and expertise.
+                  {t("partnersPage.value.description")}
                 </p>
               </div>
 
@@ -191,17 +179,15 @@ export default function Hub() {
               <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
                   <p className="text-sm font-medium text-orange-300">
-                    Join the Bouwiser network
+                    {t("partnersPage.cta.eyebrow")}
                   </p>
 
                   <h2 className="mt-2 text-2xl font-semibold tracking-[-0.025em] sm:text-3xl">
-                    Interested in becoming a Bouwiser partner?
+                    {t("partnersPage.cta.title")}
                   </h2>
 
                   <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
-                    Manufacturers, suppliers and renovation professionals can
-                    contact Bouwiser to discuss product visibility,
-                    collaboration and participation in the platform.
+                    {t("partnersPage.cta.description")}
                   </p>
                 </div>
 
@@ -210,7 +196,7 @@ export default function Hub() {
                   onClick={() => navigate("/contact")}
                   className="group inline-flex h-12 shrink-0 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
                 >
-                  Contact Bouwiser
+                  {t("partnersPage.cta.button")}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
               </div>

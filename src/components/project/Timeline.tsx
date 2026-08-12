@@ -51,40 +51,30 @@ export default function Timeline({
   const translateKnownValue = (value: string) => {
     const knownValues: Record<string, string> = {
       Completed: t("timeline.status.completed"),
-      Voltooid: t("timeline.status.completed"),
       Current: t("timeline.status.current"),
-      Huidig: t("timeline.status.current"),
       Upcoming: t("timeline.status.upcoming"),
-      Aankomend: t("timeline.status.upcoming"),
 
-      "Property analysis": t("timeline.items.propertyAnalysis.title"),
-      "Woninganalyse": t("timeline.items.propertyAnalysis.title"),
-      "AI renovation plan": t("timeline.items.aiPlan.title"),
-      "AI-renovatieplan": t("timeline.items.aiPlan.title"),
-      "Product selection": t("timeline.items.productSelection.title"),
-      "Productselectie": t("timeline.items.productSelection.title"),
+      "Photos uploaded": t("timeline.items.photosUploaded.title"),
+      "AI analysis completed": t("timeline.items.aiAnalysisCompleted.title"),
+      "Product comparison": t("timeline.items.productComparison.title"),
+      "Request contractor quotes": t("timeline.items.requestQuotes.title"),
       Installation: t("timeline.items.installation.title"),
-      Installatie: t("timeline.items.installation.title"),
 
-      "Property details and energy performance analysed.":
-        t("timeline.items.propertyAnalysis.description"),
-      "Woninggegevens en energieprestatie geanalyseerd.":
-        t("timeline.items.propertyAnalysis.description"),
-
-      "Recommended renovation measures generated based on the home profile.":
-        t("timeline.items.aiPlan.description"),
-      "Aanbevolen renovatiemaatregelen gegenereerd op basis van het woningprofiel.":
-        t("timeline.items.aiPlan.description"),
-
-      "Compare suitable products and retailer offers.":
-        t("timeline.items.productSelection.description"),
-      "Vergelijk geschikte producten en aanbiedingen van winkels.":
-        t("timeline.items.productSelection.description"),
-
-      "Plan and complete the selected renovation measures.":
+      "Exterior, roof and heating system photos added":
+        t("timeline.items.photosUploaded.description"),
+      "Energy performance and renovation options reviewed":
+        t("timeline.items.aiAnalysisCompleted.description"),
+      "Compare recommended renovation products":
+        t("timeline.items.productComparison.description"),
+      "Send the project scope to verified contractors":
+        t("timeline.items.requestQuotes.description"),
+      "Schedule and complete the selected renovation work":
         t("timeline.items.installation.description"),
-      "Plan en voltooi de geselecteerde renovatiemaatregelen.":
-        t("timeline.items.installation.description"),
+
+      "12 July 2026": t("timeline.dates.july12"),
+      "14 July 2026": t("timeline.dates.july14"),
+      "Current step": t("timeline.dates.currentStep"),
+     
     };
 
     return knownValues[value] ?? value;
@@ -112,10 +102,7 @@ export default function Timeline({
           const isLast = index === project.timeline.length - 1;
 
           return (
-            <div
-              key={item.id}
-              className="relative flex gap-4"
-            >
+            <div key={item.id} className="relative flex gap-4">
               <div className="flex flex-col items-center">
                 <div
                   className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-sm ${styles.icon}`}
@@ -130,9 +117,7 @@ export default function Timeline({
                 </div>
 
                 {!isLast && (
-                  <div
-                    className={`h-full min-h-24 w-0.5 ${styles.line}`}
-                  />
+                  <div className={`h-full min-h-24 w-0.5 ${styles.line}`} />
                 )}
               </div>
 
@@ -159,7 +144,7 @@ export default function Timeline({
 
                 <div className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
                   <Clock3 className="h-4 w-4" />
-                  {item.date}
+                  {translateKnownValue(item.date)}
                 </div>
               </article>
             </div>

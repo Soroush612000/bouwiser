@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   Bot,
@@ -12,7 +13,7 @@ import {
 
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardLayout from "../layouts/DashboardLayout";
-import { projects } from "../data/projects";
+import { getProjectDisplayData, projects } from "../data/projects";
 import { supabase } from "@/utils/supabase";
 
 function parseEuro(value: string) {
@@ -78,8 +79,9 @@ type SavedScan = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [activeItem, setActiveItem] = useState("dashboard");
-  const [userName, setUserName] = useState("Homeowner");
+  const [userName, setUserName] = useState(t("dashboard.defaultUser"));
   const [userInitial, setUserInitial] = useState("H");
   const [authLoading, setAuthLoading] = useState(true);
   const [latestScan, setLatestScan] = useState<SavedScan | null>(null);
@@ -146,12 +148,12 @@ export default function Dashboard() {
     const scannedProject = {
       id: String(latestScan.id),
       name: latestScan.projectName,
-      propertyType: latestScan.propertyType || "Home",
-      city: latestScan.city || "Unknown city",
+      propertyType: latestScan.propertyType || t("dashboard.home"),
+      city: latestScan.city || t("dashboard.unknownCity"),
       status: latestScan.status,
-      budget: "To be estimated",
+      budget: t("dashboard.toBeEstimated"),
       progress: latestScan.progress,
-      nextAction: "Review AI renovation recommendations",
+      nextAction: t("dashboard.reviewAiRecommendations"),
       annualSaving: `€${latestScan.analysis.annualSaving}`,
       aiScore: latestScan.analysis.confidence,
       co2Reduction: `${latestScan.analysis.co2Reduction}%`,
@@ -183,35 +185,35 @@ export default function Dashboard() {
 
     return [
       {
-        title: "Active Projects",
+        title: t("dashboard.stats.activeProjects"),
         value: String(activeProjects),
-        description: `${dashboardProjects.length} total projects`,
+        description: t("dashboard.stats.totalProjects", { count: dashboardProjects.length }),
         icon: FolderKanban,
         iconStyle: "bg-orange-100 text-orange-600",
       },
       {
-        title: "AI Reports",
+        title: t("dashboard.stats.aiReports"),
         value: String(dashboardProjects.length),
-        description: `${averageAiScore}% average confidence`,
+        description: t("dashboard.stats.averageConfidence", { score: averageAiScore }),
         icon: Bot,
         iconStyle: "bg-violet-100 text-violet-600",
       },
       {
-        title: "Estimated Savings",
+        title: t("dashboard.stats.estimatedSavings"),
         value: formatEuro(totalSavingsValue),
-        description: "Expected annual savings",
+        description: t("dashboard.stats.expectedAnnualSavings"),
         icon: CircleDollarSign,
         iconStyle: "bg-emerald-100 text-emerald-600",
       },
       {
-        title: "Average AI Score",
+        title: t("dashboard.stats.averageAiScore"),
         value: `${averageAiScore}%`,
-        description: "Across all projects",
+        description: t("dashboard.stats.acrossAllProjects"),
         icon: Zap,
         iconStyle: "bg-blue-100 text-blue-600",
       },
     ];
-  }, [dashboardProjects]);
+  }, [dashboardProjects, t]);
 
   const totalSavings = dashboardProjects.reduce(
     (total, project) => total + parseEuro(project.annualSaving),
@@ -245,7 +247,7 @@ export default function Dashboard() {
         <div className="rounded-2xl border border-slate-200 bg-white px-6 py-5 text-center shadow-sm">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-orange-100 border-t-orange-500" />
           <p className="mt-4 text-sm font-semibold text-slate-600">
-            Loading your Bouwiser workspace...
+            {t("dashboard.loading")}
           </p>
         </div>
       </div>
@@ -269,15 +271,15 @@ export default function Dashboard() {
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">
-              Dashboard overview
+              {t("dashboard.eyebrow")}
             </p>
 
             <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-950">
-              Welcome back, {userName}
+              {t("dashboard.welcomeBack", { name: userName })}
             </h1>
 
             <p className="mt-2 text-slate-500">
-              Manage renovation projects, AI reports and energy improvements.
+              {t("dashboard.description")}
             </p>
           </div>
 
@@ -287,7 +289,7 @@ export default function Dashboard() {
             className="flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
           >
             <Plus className="h-5 w-5" />
-            New Project
+            {t("dashboard.newProject")}
           </button>
         </div>
 
@@ -327,15 +329,15 @@ export default function Dashboard() {
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-orange-500">
-                  Active projects
+                  {t("dashboard.activeProjects")}
                 </p>
 
                 <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                  Renovation progress
+                  {t("dashboard.renovationProgress")}
                 </h2>
 
                 <p className="mt-3 text-sm text-slate-500">
-                  Monitor each project and continue from its current stage.
+                  {t("dashboard.monitorProjects")}
                 </p>
               </div>
 
@@ -344,13 +346,24 @@ export default function Dashboard() {
                 onClick={() => navigate("/projects")}
                 className="flex items-center gap-2 text-sm font-bold text-orange-600 transition hover:text-orange-700"
               >
-                View all projects
+                {t("dashboard.viewAllProjects")}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
 
             <div className="mt-7 space-y-5">
-              {dashboardProjects.slice(0, 4).map((project) => (
+              {dashboardProjects.slice(0, 4).map((project) => {
+                const displayProject =
+                  "isLatestScan" in project && project.isLatestScan
+                    ? {
+                        name: project.name,
+                        propertyType: project.propertyType,
+                        status: project.status,
+                        nextAction: project.nextAction,
+                      }
+                    : getProjectDisplayData(project, i18n.language);
+
+                return (
                 <button
                   key={project.id}
                   type="button"
@@ -365,22 +378,22 @@ export default function Dashboard() {
                     <div>
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="text-lg font-black text-slate-950 group-hover:text-orange-600">
-                          {project.name}
+                          {displayProject.name}
                         </h3>
 
                         <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
-                          {project.status}
+                          {displayProject.status}
                         </span>
                       </div>
 
                       <p className="mt-2 text-sm text-slate-500">
-                        {project.propertyType} · {project.city}
+                        {displayProject.propertyType} · {project.city}
                       </p>
                     </div>
 
                     <div className="text-left sm:text-right">
                       <p className="text-sm text-slate-500">
-                        Estimated budget
+                        {t("dashboard.estimatedBudget")}
                       </p>
 
                       <p className="mt-1 font-black text-slate-950">
@@ -391,7 +404,7 @@ export default function Dashboard() {
 
                   <div className="mt-5">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-500">Project progress</span>
+                      <span className="text-slate-500">{t("dashboard.projectProgress")}</span>
 
                       <span className="font-black text-slate-950">
                         {project.progress}%
@@ -409,22 +422,23 @@ export default function Dashboard() {
                   <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                       <Sparkles className="h-4 w-4 text-orange-500" />
-                      {project.nextAction}
+                      {displayProject.nextAction}
                     </div>
 
                     <div className="flex items-center gap-2 font-bold text-orange-600">
-                      Open project
+                      {t("dashboard.openProject")}
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   </div>
                 </button>
-              ))}
+                );
+              })}
             </div>
           </section>
 
           <section className="rounded-[30px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-7 text-white shadow-2xl">
             <p className="text-sm font-semibold text-slate-400">
-              Portfolio performance
+              {t("dashboard.portfolioPerformance")}
             </p>
 
             <div className="mt-5 flex items-start justify-between gap-4">
@@ -432,7 +446,7 @@ export default function Dashboard() {
                 <p className="text-6xl font-black">{averageProgress}%</p>
 
                 <p className="mt-2 text-sm text-slate-400">
-                  Average project progress
+                  {t("dashboard.averageProjectProgress")}
                 </p>
               </div>
 
@@ -443,7 +457,7 @@ export default function Dashboard() {
 
             <div className="mt-8">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">Portfolio completion</span>
+                <span className="text-slate-400">{t("dashboard.portfolioCompletion")}</span>
                 <span className="font-black">{averageProgress} / 100</span>
               </div>
 
@@ -458,7 +472,7 @@ export default function Dashboard() {
             <div className="mt-8 grid grid-cols-2 gap-4">
               <article className="rounded-2xl bg-white/5 p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Annual savings
+                  {t("dashboard.annualSavings")}
                 </p>
                 <p className="mt-2 text-2xl font-black">
                   {formatEuro(totalSavings)}
@@ -467,7 +481,7 @@ export default function Dashboard() {
 
               <article className="rounded-2xl bg-white/5 p-5">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  CO₂ reduction
+                  {t("dashboard.co2Reduction")}
                 </p>
                 <p className="mt-2 text-2xl font-black">
                   {averageCo2Reduction}%
@@ -477,15 +491,24 @@ export default function Dashboard() {
 
             <div className="mt-6 rounded-[24px] bg-white/5 p-5">
               <p className="text-sm font-semibold text-slate-400">
-                Best-performing project
+                {t("dashboard.bestPerformingProject")}
               </p>
 
               <p className="mt-2 text-lg font-black">
-                {
-                  [...dashboardProjects].sort(
+                {(() => {
+                  const bestProject = [...dashboardProjects].sort(
                     (a, b) => b.progress - a.progress,
-                  )[0].name
-                }
+                  )[0];
+
+                  if ("isLatestScan" in bestProject && bestProject.isLatestScan) {
+                    return bestProject.name;
+                  }
+
+                  return getProjectDisplayData(
+                    bestProject,
+                    i18n.language,
+                  ).name;
+                })()}
               </p>
 
               <p className="mt-2 text-sm text-emerald-400">
@@ -494,7 +517,7 @@ export default function Dashboard() {
                     (a, b) => b.progress - a.progress,
                   )[0].progress
                 }
-                % completed
+                % {t("dashboard.completed")}
               </p>
             </div>
           </section>

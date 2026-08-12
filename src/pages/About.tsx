@@ -1,34 +1,34 @@
 import { Bot, Leaf, Search, ShieldCheck } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import Navbar from "../components/Navbar";
 
-const pillars = [
-  {
-    icon: Search,
-    title: "Simplify comparison",
-    text:
-      "Bring fragmented product, material, cost and renovation information together in one structured environment.",
-  },
-  {
-    icon: Bot,
-    title: "Guide smarter decisions",
-    text:
-      "Combine property information, renovation goals and digital guidance to help homeowners identify relevant options.",
-  },
-  {
-    icon: Leaf,
-    title: "Support sustainable renovation",
-    text:
-      "Make energy performance, renovation measures and sustainable material choices easier to understand and compare.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Improve transparency",
-    text:
-      "Provide clearer information about products, specifications, suppliers, costs and performance.",
-  },
-];
-
 export default function About() {
+  const { t } = useTranslation();
+
+  const pillars = [
+    {
+      icon: Search,
+      title: t("aboutPage.pillars.comparison.title"),
+      text: t("aboutPage.pillars.comparison.text"),
+    },
+    {
+      icon: Bot,
+      title: t("aboutPage.pillars.decisions.title"),
+      text: t("aboutPage.pillars.decisions.text"),
+    },
+    {
+      icon: Leaf,
+      title: t("aboutPage.pillars.sustainability.title"),
+      text: t("aboutPage.pillars.sustainability.text"),
+    },
+    {
+      icon: ShieldCheck,
+      title: t("aboutPage.pillars.transparency.title"),
+      text: t("aboutPage.pillars.transparency.text"),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white text-slate-950">
       <Navbar />
@@ -38,20 +38,15 @@ export default function About() {
         <section className="px-6 py-20 lg:px-10">
           <div className="mx-auto max-w-7xl">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-500">
-              About Bouwiser
+              {t("aboutPage.hero.eyebrow")}
             </p>
 
             <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-              Making home renovation decisions smarter, clearer and more sustainable
+              {t("aboutPage.hero.title")}
             </h1>
 
             <p className="mt-7 max-w-3xl text-lg leading-8 text-slate-600">
-              Bouwiser is a digital platform designed to make residential
-              renovation decisions easier and more transparent in the
-              Netherlands. By bringing together renovation guidance, energy
-              insights, product and material information, comparison tools and
-              supplier information, Bouwiser helps homeowners understand their
-              options and make better-informed decisions for their homes.
+              {t("aboutPage.hero.description")}
             </p>
           </div>
         </section>
@@ -82,19 +77,15 @@ export default function About() {
         <section className="px-6 py-16 lg:px-10">
           <div className="mx-auto max-w-7xl rounded-[36px] bg-orange-500 p-10 text-white">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-orange-100">
-              Our vision
+              {t("aboutPage.vision.eyebrow")}
             </p>
 
             <h2 className="mt-3 text-4xl font-black">
-              A smarter and more connected renovation ecosystem
+              {t("aboutPage.vision.title")}
             </h2>
 
             <p className="mt-4 max-w-3xl leading-7 text-orange-50">
-              Bouwiser aims to create a transparent digital environment where
-              homeowners can move from understanding their renovation needs to
-              exploring suitable measures, comparing products and materials,
-              and connecting with relevant suppliers and renovation
-              professionals.
+              {t("aboutPage.vision.description")}
             </p>
           </div>
         </section>

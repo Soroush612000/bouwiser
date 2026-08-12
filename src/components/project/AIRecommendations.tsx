@@ -52,46 +52,23 @@ export default function AIRecommendations({
   const translateKnownValue = (value: string) => {
     const knownValues: Record<string, string> = {
       "Roof insulation": t("aiRecommendations.items.roofInsulation"),
-      Dakisolatie: t("aiRecommendations.items.roofInsulation"),
-
       "Triple glazing": t("aiRecommendations.items.tripleGlazing"),
-      "Driedubbel glas": t("aiRecommendations.items.tripleGlazing"),
-
       "Hybrid heat pump": t("aiRecommendations.items.hybridHeatPump"),
-      "Hybride warmtepomp": t("aiRecommendations.items.hybridHeatPump"),
-
       "Solar panels": t("aiRecommendations.items.solarPanels"),
-      Zonnepanelen: t("aiRecommendations.items.solarPanels"),
 
       Insulation: t("aiRecommendations.categories.insulation"),
-      Isolatie: t("aiRecommendations.categories.insulation"),
-
       Windows: t("aiRecommendations.categories.windows"),
-      Ramen: t("aiRecommendations.categories.windows"),
-
       Heating: t("aiRecommendations.categories.heating"),
-      Verwarming: t("aiRecommendations.categories.heating"),
-
       Solar: t("aiRecommendations.categories.solar"),
-      Zonneenergie: t("aiRecommendations.categories.solar"),
+      "Renewable energy": t("aiRecommendations.categories.renewableEnergy"),
 
       Completed: t("aiRecommendations.status.completed"),
-      Voltooid: t("aiRecommendations.status.completed"),
-
       Planned: t("aiRecommendations.status.planned"),
-      Gepland: t("aiRecommendations.status.planned"),
-
       Recommended: t("aiRecommendations.status.recommended"),
-      Aanbevolen: t("aiRecommendations.status.recommended"),
 
       High: t("aiRecommendations.priority.high"),
-      Hoog: t("aiRecommendations.priority.high"),
-
       Medium: t("aiRecommendations.priority.medium"),
-      Gemiddeld: t("aiRecommendations.priority.medium"),
-
       Low: t("aiRecommendations.priority.low"),
-      Laag: t("aiRecommendations.priority.low"),
     };
 
     return knownValues[value] ?? value;

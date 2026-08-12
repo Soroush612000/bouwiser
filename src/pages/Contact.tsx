@@ -1,8 +1,12 @@
 import { Building2, Mail, Send } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import Navbar from "../components/Navbar";
 
 export default function Contact() {
+  const { t } = useTranslation();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
@@ -10,14 +14,18 @@ export default function Contact() {
 
   const handleContact = () => {
     const emailSubject =
-      subject.trim() || "Bouwiser website enquiry";
+      subject.trim() || t("contactPage.email.defaultSubject");
 
     const emailBody = [
-      `Name: ${name.trim() || "Not provided"}`,
-      `Email: ${email.trim() || "Not provided"}`,
+      `${t("contactPage.email.name")}: ${
+        name.trim() || t("contactPage.email.notProvided")
+      }`,
+      `${t("contactPage.email.email")}: ${
+        email.trim() || t("contactPage.email.notProvided")
+      }`,
       "",
-      "Message:",
-      message.trim() || "No message provided",
+      `${t("contactPage.email.message")}:`,
+      message.trim() || t("contactPage.email.noMessage"),
     ].join("\n");
 
     const mailtoLink =
@@ -38,16 +46,15 @@ export default function Contact() {
           <section>
             <div className="inline-flex items-center gap-2 text-sm font-black text-orange-500">
               <Mail className="h-4 w-4" />
-              Contact Bouwiser
+              {t("contactPage.hero.eyebrow")}
             </div>
 
             <h1 className="mt-5 max-w-xl text-5xl font-black tracking-tight sm:text-6xl">
-              Questions, feedback or partnership interest?
+              {t("contactPage.hero.title")}
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              We welcome questions and feedback from homeowners, suppliers,
-              manufacturers and renovation professionals.
+              {t("contactPage.hero.description")}
             </p>
 
             <div className="mt-10 space-y-4">
@@ -60,7 +67,10 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <p className="font-black">General enquiries</p>
+                  <p className="font-black">
+                    {t("contactPage.general.title")}
+                  </p>
+
                   <p className="mt-1 text-sm text-slate-500">
                     bouwiser.nl@gmail.com
                   </p>
@@ -74,11 +84,11 @@ export default function Contact() {
 
                 <div>
                   <p className="font-black">
-                    Supplier &amp; partner enquiries
+                    {t("contactPage.partners.title")}
                   </p>
 
                   <p className="mt-1 text-sm text-slate-500">
-                    Manufacturers, suppliers and renovation professionals
+                    {t("contactPage.partners.description")}
                   </p>
                 </div>
               </div>
@@ -93,7 +103,7 @@ export default function Contact() {
                   htmlFor="name"
                   className="mb-2 block text-sm font-bold text-slate-700"
                 >
-                  Name
+                  {t("contactPage.form.name")}
                 </label>
 
                 <input
@@ -101,7 +111,7 @@ export default function Contact() {
                   type="text"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Your name"
+                  placeholder={t("contactPage.form.namePlaceholder")}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 />
               </div>
@@ -111,7 +121,7 @@ export default function Contact() {
                   htmlFor="email"
                   className="mb-2 block text-sm font-bold text-slate-700"
                 >
-                  Email
+                  {t("contactPage.form.email")}
                 </label>
 
                 <input
@@ -130,7 +140,7 @@ export default function Contact() {
                 htmlFor="subject"
                 className="mb-2 block text-sm font-bold text-slate-700"
               >
-                Subject
+                {t("contactPage.form.subject")}
               </label>
 
               <input
@@ -138,7 +148,7 @@ export default function Contact() {
                 type="text"
                 value={subject}
                 onChange={(event) => setSubject(event.target.value)}
-                placeholder="What would you like to discuss?"
+                placeholder={t("contactPage.form.subjectPlaceholder")}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
             </div>
@@ -148,7 +158,7 @@ export default function Contact() {
                 htmlFor="message"
                 className="mb-2 block text-sm font-bold text-slate-700"
               >
-                Message
+                {t("contactPage.form.message")}
               </label>
 
               <textarea
@@ -156,7 +166,7 @@ export default function Contact() {
                 rows={6}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Tell us how we can help..."
+                placeholder={t("contactPage.form.messagePlaceholder")}
                 className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
             </div>
@@ -166,13 +176,12 @@ export default function Contact() {
               onClick={handleContact}
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 font-bold text-white transition hover:bg-orange-600"
             >
-              Contact Bouwiser
+              {t("contactPage.form.button")}
               <Send className="h-4 w-4" />
             </button>
 
             <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400">
-              Clicking the button opens your email application with your
-              message prepared for Bouwiser.
+              {t("contactPage.form.note")}
             </p>
           </section>
         </div>

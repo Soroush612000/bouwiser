@@ -1,16 +1,19 @@
 import { Bot, CheckCircle2, Send, Sparkles } from "lucide-react";
 import { useState } from "react";
-import Navbar from "../components/Navbar";
+import { useTranslation } from "react-i18next";
 
-const suggestions = [
-  "Which renovation should I do first?",
-  "How can I improve my energy label?",
-  "Compare roof insulation options",
-  "What subsidies may be relevant?",
-];
+import Navbar from "../components/Navbar";
 
 export default function AIAssistant() {
   const [message, setMessage] = useState("");
+  const { t } = useTranslation();
+
+  const suggestions = [
+    t("aiAssistant.suggestions.first"),
+    t("aiAssistant.suggestions.energyLabel"),
+    t("aiAssistant.suggestions.compareRoof"),
+    t("aiAssistant.suggestions.subsidies"),
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
@@ -23,11 +26,11 @@ export default function AIAssistant() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700">
               <Sparkles className="h-4 w-4" />
-              Bouwiser AI Assistant
+              {t("aiAssistant.badge")}
             </div>
 
             <h1 className="mx-auto mt-4 max-w-5xl text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
-              Renovation guidance in one conversation
+              {t("aiAssistant.title")}
             </h1>
           </div>
 
@@ -46,7 +49,7 @@ export default function AIAssistant() {
                 </p>
 
                 <p className="text-sm text-slate-500">
-                  Renovation guidance assistant
+                  {t("aiAssistant.subtitle")}
                 </p>
               </div>
             </div>
@@ -57,14 +60,11 @@ export default function AIAssistant() {
               {/* Welcome message */}
               <div className="max-w-2xl rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <p className="font-bold text-slate-900">
-                  How can I help with your renovation?
+                  {t("aiAssistant.welcomeTitle")}
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  Ask about renovation priorities, energy performance,
-                  products, sustainability and indicative costs. I can help
-                  you understand possible measures, compare options and
-                  prepare the next steps for your home.
+                  {t("aiAssistant.welcomeDescription")}
                 </p>
               </div>
 
@@ -89,13 +89,13 @@ export default function AIAssistant() {
               <input
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Ask Bouwiser AI..."
+                placeholder={t("aiAssistant.placeholder")}
                 className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
               />
 
               <button
                 type="button"
-                aria-label="Send message"
+                aria-label={t("aiAssistant.send")}
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-sm transition hover:bg-orange-600"
               >
                 <Send className="h-5 w-5" />

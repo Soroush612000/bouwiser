@@ -430,3 +430,69 @@ export const projects: ProjectData[] = [
     activities: sharedActivities,
   },
 ];
+
+
+export type ProjectDisplayTranslation = {
+  name: string;
+  propertyType: string;
+  status: string;
+  nextAction: string;
+};
+
+const projectDisplayTranslationsNL: Record<number, ProjectDisplayTranslation> = {
+  1: {
+    name: "Woningupgrade Den Haag",
+    propertyType: "Vrijstaande woning",
+    status: "In uitvoering",
+    nextAction: "Vergelijk producten voor dakisolatie",
+  },
+  2: {
+    name: "Appartementrenovatie Rotterdam",
+    propertyType: "Appartement",
+    status: "AI-analyse",
+    nextAction: "Vergelijk oplossingen voor driedubbel glas",
+  },
+  3: {
+    name: "Dakrenovatie Utrecht",
+    propertyType: "Tussenwoning",
+    status: "Eindcontrole",
+    nextAction: "Keur de offerte voor dakisolatie goed",
+  },
+  4: {
+    name: "Energie-upgrade Eindhoven",
+    propertyType: "Twee-onder-een-kapwoning",
+    status: "Planning",
+    nextAction: "Bekijk opties voor een hybride warmtepomp",
+  },
+};
+
+type ProjectDisplaySource = {
+  id: number | string;
+  name: string;
+  propertyType: string;
+  status: string;
+  nextAction: string;
+};
+
+export function getProjectDisplayData(
+  project: ProjectDisplaySource,
+  language: string,
+): ProjectDisplayTranslation {
+  if (language.startsWith("nl") && typeof project.id === "number") {
+    return (
+      projectDisplayTranslationsNL[project.id] ?? {
+        name: project.name,
+        propertyType: project.propertyType,
+        status: project.status,
+        nextAction: project.nextAction,
+      }
+    );
+  }
+
+  return {
+    name: project.name,
+    propertyType: project.propertyType,
+    status: project.status,
+    nextAction: project.nextAction,
+  };
+}

@@ -56,39 +56,29 @@ export default function ActivityFeed({
     const knownValues: Record<string, string> = {
       AI: t("activityFeed.types.ai"),
       Document: t("activityFeed.types.document"),
-      Documenten: t("activityFeed.types.document"),
       Quote: t("activityFeed.types.quote"),
-      Offerte: t("activityFeed.types.quote"),
       Task: t("activityFeed.types.task"),
-      Taak: t("activityFeed.types.task"),
 
-      "AI analysis completed": t("activityFeed.items.aiCompleted.title"),
-      "AI-analyse voltooid": t("activityFeed.items.aiCompleted.title"),
-      "AI renovation analysis has been completed for this property.":
-        t("activityFeed.items.aiCompleted.description"),
-      "De AI-renovatieanalyse voor deze woning is voltooid.":
-        t("activityFeed.items.aiCompleted.description"),
+      "AI report updated": t("activityFeed.items.aiReportUpdated.title"),
+      "The highest-priority renovation measure was updated.":
+        t("activityFeed.items.aiReportUpdated.description"),
 
       "Document uploaded": t("activityFeed.items.documentUploaded.title"),
-      "Document geüpload": t("activityFeed.items.documentUploaded.title"),
-      "A new project document has been added.":
-        t("activityFeed.items.documentUploaded.description"),
-      "Er is een nieuw projectdocument toegevoegd.":
+      "The existing energy-label certificate was added.":
         t("activityFeed.items.documentUploaded.description"),
 
       "Quotation received": t("activityFeed.items.quoteReceived.title"),
-      "Offerte ontvangen": t("activityFeed.items.quoteReceived.title"),
-      "A new contractor quotation is ready for review.":
-        t("activityFeed.items.quoteReceived.description"),
-      "Een nieuwe offerte van een aannemer staat klaar om te bekijken.":
+      "A contractor submitted a new quotation.":
         t("activityFeed.items.quoteReceived.description"),
 
       "Task completed": t("activityFeed.items.taskCompleted.title"),
-      "Taak voltooid": t("activityFeed.items.taskCompleted.title"),
-      "A renovation task has been marked as completed.":
+      "The latest property photos were reviewed.":
         t("activityFeed.items.taskCompleted.description"),
-      "Een renovatietaak is als voltooid gemarkeerd.":
-        t("activityFeed.items.taskCompleted.description"),
+
+      "18 minutes ago": t("activityFeed.times.minutes18"),
+      "2 hours ago": t("activityFeed.times.hours2"),
+      Yesterday: t("activityFeed.times.yesterday"),
+      "2 days ago": t("activityFeed.times.days2"),
     };
 
     return knownValues[value] ?? value;
@@ -147,7 +137,7 @@ export default function ActivityFeed({
                   </div>
 
                   <span className="shrink-0 text-xs font-semibold text-slate-400">
-                    {activity.time}
+                    {translateKnownValue(activity.time)}
                   </span>
                 </div>
               </div>

@@ -11,6 +11,23 @@
       "contact": "Contact",
       "startScan": "Start AI Scan"
     },
+  
+    "aiAssistant": {
+      "badge": "Bouwiser AI Assistant",
+      "title": "Renovation guidance in one conversation",
+      "subtitle": "Renovation guidance assistant",
+      "welcomeTitle": "How can I help with your renovation?",
+      "welcomeDescription": "Ask about renovation priorities, energy performance, products, sustainability and indicative costs. I can help you understand possible measures, compare options and prepare the next steps for your home.",
+      "suggestions": {
+        "first": "Which renovation should I do first?",
+        "energyLabel": "How can I improve my energy label?",
+        "compareRoof": "Compare roof insulation options",
+        "subsidies": "What subsidies may be relevant?"
+      },
+      "placeholder": "Ask Bouwiser AI...",
+      "send": "Send message"
+    },
+  
     "products": {
       "browseTitle": "Browse & compare products",
       "browseDescription": "Compare building products, prices and performance.",
@@ -23,11 +40,13 @@
         "materials": "Materials"
       }
     },
+  
     "comparison": {
       "title": "Compare smarter.",
       "description": "Compare products, specifications and retailer prices in one place.",
       "action": "Explore products"
     },
+  
     "common": {
       "language": "Language",
       "dutch": "Dutch",

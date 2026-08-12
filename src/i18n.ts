@@ -196,33 +196,27 @@ const resources = {
         goals: {
           lowerBills: {
             title: "Lagere energierekening",
-            description:
-              "Verlaag de maandelijkse kosten voor gas en elektriciteit.",
+            description: "Verlaag de maandelijkse kosten voor gas en elektriciteit.",
           },
           comfort: {
             title: "Meer comfort",
-            description:
-              "Maak je woning warmer en comfortabeler.",
+            description: "Maak je woning warmer en comfortabeler.",
           },
           homeValue: {
             title: "Woningwaarde verhogen",
-            description:
-              "Verbeter de waarde van je woning op lange termijn.",
+            description: "Verbeter de waarde van je woning op lange termijn.",
           },
           solar: {
             title: "Zonnepanelen installeren",
-            description:
-              "Wek thuis hernieuwbare elektriciteit op.",
+            description: "Wek thuis hernieuwbare elektriciteit op.",
           },
           heatPump: {
             title: "Warmtepomp installeren",
-            description:
-              "Stap over op efficiënte, koolstofarme verwarming.",
+            description: "Stap over op efficiënte, koolstofarme verwarming.",
           },
           insulation: {
             title: "Isolatie verbeteren",
-            description:
-              "Verminder warmteverlies via dak, muren en vloer.",
+            description: "Verminder warmteverlies via dak, muren en vloer.",
           },
         },
 
@@ -267,7 +261,351 @@ const resources = {
         },
       },
 
+      aiAssistant: {
+        badge: "Bouwiser AI-assistent",
+        title: "Renovatieadvies in één gesprek",
+        subtitle: "Assistent voor renovatieadvies",
+        welcomeTitle: "Waarmee kan ik je helpen bij je renovatie?",
+        welcomeDescription:
+          "Vraag naar renovatieprioriteiten, energieprestaties, producten, duurzaamheid en indicatieve kosten. Ik kan je helpen mogelijke maatregelen te begrijpen, opties te vergelijken en de volgende stappen voor je woning voor te bereiden.",
+        suggestions: {
+          first: "Welke renovatie kan ik het beste als eerste doen?",
+          energyLabel: "Hoe kan ik mijn energielabel verbeteren?",
+          compareRoof: "Vergelijk opties voor dakisolatie",
+          subsidies: "Welke subsidies kunnen relevant zijn?",
+        },
+        placeholder: "Vraag het aan Bouwiser AI...",
+        send: "Bericht verzenden",
+      },
 
+      energy: {
+        hero: {
+          eyebrow: "Energieverbetering",
+          title: "Verbeter de energieprestatie van je woning.",
+          description:
+            "Ontdek hoe renovatiemaatregelen het energieverbruik kunnen verlagen, het comfort kunnen verbeteren en kunnen bijdragen aan een beter energielabel.",
+          analyse: "Analyseer mijn woning",
+          note:
+            "Persoonlijke resultaten zijn afhankelijk van de informatie die je over je woning verstrekt.",
+        },
+
+        scenario: {
+          eyebrow: "Voorbeeld van een woningscenario",
+          title: "Bekijk hoe renovatiemaatregelen elkaar kunnen versterken.",
+          description:
+            "Dit voorbeeld laat zien hoe meerdere verbeteringen samen kunnen bijdragen aan een betere algemene energieprestatie.",
+          badge: "Illustratief voorbeeld",
+          current: "Huidig voorbeeld",
+          labelD: "Label D",
+          currentDescription:
+            "Het startpunt dat voor dit voorbeeld van het renovatietraject wordt gebruikt.",
+          improvements: "Voorbeeldverbeteringen",
+          improvementItems: [
+            "Verbeter de dakisolatie",
+            "Upgrade de beglazing",
+            "Verbeter het verwarmingssysteem",
+          ],
+          potential: "Mogelijk resultaat",
+          labelB: "Label B",
+          potentialDescription:
+            "Mogelijk lager energieverbruik en verbeterd thermisch comfort.",
+          note:
+            "Resultaten voor het energielabel zijn afhankelijk van de woning, de bestaande bouwkundige kenmerken en de uitgevoerde maatregelen.",
+        },
+
+        renovation: {
+          eyebrow: "Renovatiemaatregelen",
+          title: "Waar kan de energieprestatie verbeteren?",
+          description:
+            "Verschillende onderdelen van een woning beïnvloeden het energieverbruik en comfort. Bouwiser helpt je begrijpen welke verbeteringen relevant kunnen zijn.",
+        },
+
+        impact: {
+          high: "Hoog",
+          mediumHigh: "Gemiddeld–hoog",
+        },
+
+        impactLabel: "{{impact}} effect",
+
+        categories: {
+          insulation: "isolatie",
+          windows: "ramen",
+          heating: "verwarming",
+        },
+
+        measures: {
+          roof: {
+            title: "Dakisolatie",
+            description:
+              "Verminder warmteverlies via het dak en verbeter het binnencomfort.",
+          },
+          glazing: {
+            title: "Hoogwaardige beglazing",
+            description:
+              "Verbeter het thermisch comfort en verminder warmteverlies via ramen.",
+          },
+          heatPump: {
+            title: "Hybride warmtepomp",
+            description:
+              "Verminder het gasverbruik door een warmtepomp te combineren met een bestaande cv-ketel.",
+          },
+        },
+
+        exploreCategory: "Bekijk {{category}}",
+
+        cta: {
+          eyebrow: "Elke woning is anders.",
+          title: "Ontdek renovatiemogelijkheden voor je eigen woning.",
+          description:
+            "Voeg basisinformatie over je woning toe en laat Bouwiser een relevanter startpunt maken voor je renovatiebeslissingen.",
+          button: "Start AI-woningscan",
+          note:
+            "De werkelijke energieprestatie en mogelijke verbeteringen zijn afhankelijk van de individuele woning en de uitgevoerde maatregelen.",
+        },
+      },
+
+
+      aboutPage: {
+        hero: {
+          eyebrow: "Over Bouwiser",
+          title:
+            "Renovatiebeslissingen slimmer, duidelijker en duurzamer maken",
+          description:
+            "Bouwiser is een digitaal platform dat renovatiebeslissingen voor woningen in Nederland eenvoudiger en transparanter maakt. Door renovatieadvies, energie-inzichten, product- en materiaalinformatie, vergelijkingstools en leveranciersinformatie samen te brengen, helpt Bouwiser huiseigenaren hun mogelijkheden beter te begrijpen en beter onderbouwde keuzes voor hun woning te maken.",
+        },
+
+        pillars: {
+          comparison: {
+            title: "Vergelijken eenvoudiger maken",
+            text:
+              "Breng versnipperde informatie over producten, materialen, kosten en renovatie samen in één gestructureerde omgeving.",
+          },
+          decisions: {
+            title: "Slimmere beslissingen ondersteunen",
+            text:
+              "Combineer woninggegevens, renovatiedoelen en digitale begeleiding om huiseigenaren te helpen relevante opties te herkennen.",
+          },
+          sustainability: {
+            title: "Duurzame renovatie ondersteunen",
+            text:
+              "Maak energieprestaties, renovatiemaatregelen en duurzame materiaalkeuzes eenvoudiger te begrijpen en te vergelijken.",
+          },
+          transparency: {
+            title: "Transparantie verbeteren",
+            text:
+              "Bied duidelijkere informatie over producten, specificaties, leveranciers, kosten en prestaties.",
+          },
+        },
+
+        vision: {
+          eyebrow: "Onze visie",
+          title: "Een slimmer en beter verbonden renovatie-ecosysteem",
+          description:
+            "Bouwiser wil een transparante digitale omgeving creëren waarin huiseigenaren van het begrijpen van hun renovatiebehoeften kunnen doorgaan naar het verkennen van geschikte maatregelen, het vergelijken van producten en materialen en het vinden van relevante leveranciers en renovatieprofessionals.",
+        },
+      },
+
+
+      partnersPage: {
+        hero: {
+          eyebrow: "Leveranciers- & partnernetwerk",
+          titleLine1: "Verbind renovatieproducten",
+          titleLine2: "met huiseigenaren.",
+          description:
+            "Bouwiser brengt fabrikanten, leveranciers en renovatieprofessionals samen in één gestructureerde omgeving waar huiseigenaren producten kunnen verkennen, opties kunnen begrijpen en hun volgende renovatiestappen kunnen plannen.",
+        },
+
+        network: {
+          eyebrow: "Partnernetwerk",
+          title: "Gebouwd voor het renovatie-ecosysteem.",
+          description:
+            "Bouwiser is ontworpen om de verschillende partijen die betrokken zijn bij woningrenovatie met elkaar te verbinden via duidelijkere informatie en een meer gestructureerde klantreis voor huiseigenaren.",
+        },
+
+        types: {
+          manufacturers: {
+            title: "Fabrikanten",
+            description:
+              "Presenteer bouwproducten met duidelijke specificaties, prestatie-informatie en relevante renovatietoepassingen.",
+          },
+          suppliers: {
+            title: "Leveranciers",
+            description:
+              "Help huiseigenaren beschikbare producten te ontdekken en geschikte opties te vergelijken binnen één gestructureerde omgeving.",
+          },
+          professionals: {
+            title: "Renovatieprofessionals",
+            description:
+              "Verbind renovatie-expertise met huiseigenaren die actief verbeteringen aan hun woning plannen.",
+          },
+        },
+
+        value: {
+          eyebrow: "Waarom samenwerken met Bouwiser?",
+          title:
+            "Een duidelijkere route van productinformatie naar renovatiebeslissingen.",
+          description:
+            "Bouwiser wil renovatie-informatie nuttiger maken voor huiseigenaren en tegelijkertijd zakelijke partners een gestructureerde manier bieden om relevante producten en expertise te presenteren.",
+        },
+
+        benefits: {
+          visibility: {
+            title: "Productzichtbaarheid",
+            description:
+              "Maak producten gemakkelijker vindbaar binnen relevante renovatiecategorieën en klantreizen van huiseigenaren.",
+          },
+          comparison: {
+            title: "Gestructureerd vergelijken",
+            description:
+              "Presenteer productinformatie in een consistente vorm die huiseigenaren helpt opties te begrijpen en te vergelijken.",
+          },
+          connections: {
+            title: "Relevante connecties met huiseigenaren",
+            description:
+              "Bereik huiseigenaren op het moment dat zij renovatiemaatregelen, producten en vervolgstappen onderzoeken.",
+          },
+        },
+
+        cta: {
+          eyebrow: "Word onderdeel van het Bouwiser-netwerk",
+          title: "Interesse om partner van Bouwiser te worden?",
+          description:
+            "Fabrikanten, leveranciers en renovatieprofessionals kunnen contact opnemen met Bouwiser om productzichtbaarheid, samenwerking en deelname aan het platform te bespreken.",
+          button: "Neem contact op met Bouwiser",
+        },
+      },
+
+
+      contactPage: {
+        hero: {
+          eyebrow: "Contact Bouwiser",
+          title: "Vragen, feedback of interesse in samenwerking?",
+          description:
+            "We verwelkomen vragen en feedback van huiseigenaren, leveranciers, fabrikanten en renovatieprofessionals.",
+        },
+
+        general: {
+          title: "Algemene vragen",
+        },
+
+        partners: {
+          title: "Vragen van leveranciers & partners",
+          description:
+            "Fabrikanten, leveranciers en renovatieprofessionals",
+        },
+
+        form: {
+          name: "Naam",
+          namePlaceholder: "Je naam",
+          email: "E-mail",
+          subject: "Onderwerp",
+          subjectPlaceholder: "Waar wil je het over hebben?",
+          message: "Bericht",
+          messagePlaceholder: "Vertel ons hoe we kunnen helpen...",
+          button: "Neem contact op met Bouwiser",
+          note:
+            "Als je op de knop klikt, wordt je e-mailprogramma geopend met een voorbereid bericht voor Bouwiser.",
+        },
+
+        email: {
+          defaultSubject: "Vraag via de Bouwiser-website",
+          name: "Naam",
+          email: "E-mail",
+          message: "Bericht",
+          notProvided: "Niet opgegeven",
+          noMessage: "Geen bericht opgegeven",
+        },
+      },
+
+
+      loginModal: {
+        trigger: "Inloggen",
+        close: "Authenticatievenster sluiten",
+
+        login: {
+          title: "Welkom terug",
+          description: "Log in om je renovatieprojecten te beheren.",
+        },
+
+        signup: {
+          title: "Maak je account aan",
+          description:
+            "Maak je Bouwiser-account aan en start je renovatietraject.",
+        },
+
+        fields: {
+          fullName: "Volledige naam",
+          fullNamePlaceholder: "Je volledige naam",
+          email: "E-mailadres",
+          password: "Wachtwoord",
+          passwordPlaceholder: "Minimaal 8 tekens",
+        },
+
+        togglePassword: "Wachtwoord tonen of verbergen",
+
+        actions: {
+          pleaseWait: "Even geduld...",
+          login: "Inloggen bij Bouwiser",
+          createAccount: "Account aanmaken",
+        },
+
+        switch: {
+          noAccount: "Nog geen account?",
+          haveAccount: "Heb je al een account?",
+          createAccount: "Account aanmaken",
+          login: "Inloggen",
+        },
+
+        messages: {
+          accountCreated:
+            "Account aangemaakt. Controleer je e-mail en bevestig je account.",
+          genericError: "Er is iets misgegaan. Probeer het opnieuw.",
+        },
+      },
+
+      dashboard: {
+        defaultUser: "Huiseigenaar",
+        home: "Woning",
+        unknownCity: "Onbekende plaats",
+        toBeEstimated: "Nog te bepalen",
+        reviewAiRecommendations: "Bekijk de AI-renovatieaanbevelingen",
+
+        loading: "Je Bouwiser-werkruimte wordt geladen...",
+        eyebrow: "Dashboardoverzicht",
+        welcomeBack: "Welkom terug, {{name}}",
+        description:
+          "Beheer renovatieprojecten, AI-rapporten en energieverbeteringen.",
+        newProject: "Nieuw project",
+
+        stats: {
+          activeProjects: "Actieve projecten",
+          totalProjects_one: "{{count}} project in totaal",
+          totalProjects_other: "{{count}} projecten in totaal",
+          aiReports: "AI-rapporten",
+          averageConfidence: "{{score}}% gemiddelde betrouwbaarheid",
+          estimatedSavings: "Geschatte besparingen",
+          expectedAnnualSavings: "Verwachte jaarlijkse besparingen",
+          averageAiScore: "Gemiddelde AI-score",
+          acrossAllProjects: "Over alle projecten",
+        },
+
+        activeProjects: "Actieve projecten",
+        renovationProgress: "Renovatievoortgang",
+        monitorProjects:
+          "Volg elk project en ga verder vanaf de huidige fase.",
+        viewAllProjects: "Bekijk alle projecten",
+        estimatedBudget: "Geschat budget",
+        projectProgress: "Projectvoortgang",
+        openProject: "Project openen",
+
+        portfolioPerformance: "Portefeuilleprestaties",
+        averageProjectProgress: "Gemiddelde projectvoortgang",
+        portfolioCompletion: "Voltooiing portefeuille",
+        annualSavings: "Jaarlijkse besparingen",
+        co2Reduction: "CO₂-reductie",
+        bestPerformingProject: "Best presterende project",
+        completed: "voltooid",
+      },
 
       dashboardSidebar: {
         smartPlatform: "Slim renovatieplatform",
@@ -1237,7 +1575,351 @@ const resources = {
         },
       },
 
+      aiAssistant: {
+        badge: "Bouwiser AI Assistant",
+        title: "Renovation guidance in one conversation",
+        subtitle: "Renovation guidance assistant",
+        welcomeTitle: "How can I help with your renovation?",
+        welcomeDescription:
+          "Ask about renovation priorities, energy performance, products, sustainability and indicative costs. I can help you understand possible measures, compare options and prepare the next steps for your home.",
+        suggestions: {
+          first: "Which renovation should I do first?",
+          energyLabel: "How can I improve my energy label?",
+          compareRoof: "Compare roof insulation options",
+          subsidies: "What subsidies may be relevant?",
+        },
+        placeholder: "Ask Bouwiser AI...",
+        send: "Send message",
+      },
 
+      energy: {
+        hero: {
+          eyebrow: "Energy improvement",
+          title: "Improve your home's energy performance.",
+          description:
+            "Understand how renovation measures can reduce energy use, improve comfort and support a better energy label.",
+          analyse: "Analyse my home",
+          note:
+            "Personalised results depend on the information provided about your home.",
+        },
+
+        scenario: {
+          eyebrow: "Example home scenario",
+          title: "See how renovation measures can work together.",
+          description:
+            "This example illustrates how several improvements could contribute to better overall energy performance.",
+          badge: "Illustrative example",
+          current: "Current example",
+          labelD: "Label D",
+          currentDescription:
+            "The starting point used for this example renovation journey.",
+          improvements: "Example improvements",
+          improvementItems: [
+            "Improve roof insulation",
+            "Upgrade glazing",
+            "Improve the heating system",
+          ],
+          potential: "Potential outcome",
+          labelB: "Label B",
+          potentialDescription:
+            "Potentially lower energy use and improved thermal comfort.",
+          note:
+            "Energy-label outcomes depend on the property, existing building characteristics and the measures implemented.",
+        },
+
+        renovation: {
+          eyebrow: "Renovation measures",
+          title: "Where can energy performance improve?",
+          description:
+            "Different parts of a home influence energy use and comfort. Bouwiser helps you understand which improvements may be relevant.",
+        },
+
+        impact: {
+          high: "High",
+          mediumHigh: "Medium–High",
+        },
+
+        impactLabel: "{{impact}} impact",
+
+        categories: {
+          insulation: "insulation",
+          windows: "windows",
+          heating: "heating",
+        },
+
+        measures: {
+          roof: {
+            title: "Roof insulation",
+            description:
+              "Reduce heat loss through the roof and improve indoor comfort.",
+          },
+          glazing: {
+            title: "High-performance glazing",
+            description:
+              "Improve thermal comfort and reduce heat loss through windows.",
+          },
+          heatPump: {
+            title: "Hybrid heat pump",
+            description:
+              "Reduce gas consumption by combining a heat pump with an existing boiler.",
+          },
+        },
+
+        exploreCategory: "Explore {{category}}",
+
+        cta: {
+          eyebrow: "Your home is different.",
+          title: "Find renovation opportunities for your own home.",
+          description:
+            "Add basic property information and let Bouwiser create a more relevant starting point for your renovation decisions.",
+          button: "Start AI Home Scan",
+          note:
+            "Actual energy performance and possible improvements depend on the individual property and the measures implemented.",
+        },
+      },
+
+
+      aboutPage: {
+        hero: {
+          eyebrow: "About Bouwiser",
+          title:
+            "Making home renovation decisions smarter, clearer and more sustainable",
+          description:
+            "Bouwiser is a digital platform designed to make residential renovation decisions easier and more transparent in the Netherlands. By bringing together renovation guidance, energy insights, product and material information, comparison tools and supplier information, Bouwiser helps homeowners understand their options and make better-informed decisions for their homes.",
+        },
+
+        pillars: {
+          comparison: {
+            title: "Simplify comparison",
+            text:
+              "Bring fragmented product, material, cost and renovation information together in one structured environment.",
+          },
+          decisions: {
+            title: "Guide smarter decisions",
+            text:
+              "Combine property information, renovation goals and digital guidance to help homeowners identify relevant options.",
+          },
+          sustainability: {
+            title: "Support sustainable renovation",
+            text:
+              "Make energy performance, renovation measures and sustainable material choices easier to understand and compare.",
+          },
+          transparency: {
+            title: "Improve transparency",
+            text:
+              "Provide clearer information about products, specifications, suppliers, costs and performance.",
+          },
+        },
+
+        vision: {
+          eyebrow: "Our vision",
+          title: "A smarter and more connected renovation ecosystem",
+          description:
+            "Bouwiser aims to create a transparent digital environment where homeowners can move from understanding their renovation needs to exploring suitable measures, comparing products and materials, and connecting with relevant suppliers and renovation professionals.",
+        },
+      },
+
+
+      partnersPage: {
+        hero: {
+          eyebrow: "Supplier & partner network",
+          titleLine1: "Connect renovation products",
+          titleLine2: "with homeowners.",
+          description:
+            "Bouwiser brings manufacturers, suppliers and renovation professionals into one structured environment where homeowners can explore products, understand options and plan their next renovation steps.",
+        },
+
+        network: {
+          eyebrow: "Partner network",
+          title: "Built for the renovation ecosystem.",
+          description:
+            "Bouwiser is designed to connect the different parties involved in residential renovation through clearer information and a more structured homeowner journey.",
+        },
+
+        types: {
+          manufacturers: {
+            title: "Manufacturers",
+            description:
+              "Present building products with clear specifications, performance information and relevant renovation applications.",
+          },
+          suppliers: {
+            title: "Suppliers",
+            description:
+              "Help homeowners discover available products and compare suitable options in one structured environment.",
+          },
+          professionals: {
+            title: "Renovation professionals",
+            description:
+              "Connect renovation expertise with homeowners who are actively planning improvements to their properties.",
+          },
+        },
+
+        value: {
+          eyebrow: "Why partner with Bouwiser?",
+          title:
+            "A clearer route from product information to renovation decisions.",
+          description:
+            "Bouwiser aims to make renovation information more useful for homeowners while giving industry partners a structured way to present relevant products and expertise.",
+        },
+
+        benefits: {
+          visibility: {
+            title: "Product visibility",
+            description:
+              "Make products easier to discover within relevant renovation categories and homeowner journeys.",
+          },
+          comparison: {
+            title: "Structured comparison",
+            description:
+              "Present product information in a consistent format that helps homeowners understand and compare options.",
+          },
+          connections: {
+            title: "Relevant homeowner connections",
+            description:
+              "Reach homeowners at the moment they are exploring renovation measures, products and next steps.",
+          },
+        },
+
+        cta: {
+          eyebrow: "Join the Bouwiser network",
+          title: "Interested in becoming a Bouwiser partner?",
+          description:
+            "Manufacturers, suppliers and renovation professionals can contact Bouwiser to discuss product visibility, collaboration and participation in the platform.",
+          button: "Contact Bouwiser",
+        },
+      },
+
+
+      contactPage: {
+        hero: {
+          eyebrow: "Contact Bouwiser",
+          title: "Questions, feedback or partnership interest?",
+          description:
+            "We welcome questions and feedback from homeowners, suppliers, manufacturers and renovation professionals.",
+        },
+
+        general: {
+          title: "General enquiries",
+        },
+
+        partners: {
+          title: "Supplier & partner enquiries",
+          description:
+            "Manufacturers, suppliers and renovation professionals",
+        },
+
+        form: {
+          name: "Name",
+          namePlaceholder: "Your name",
+          email: "Email",
+          subject: "Subject",
+          subjectPlaceholder: "What would you like to discuss?",
+          message: "Message",
+          messagePlaceholder: "Tell us how we can help...",
+          button: "Contact Bouwiser",
+          note:
+            "Clicking the button opens your email application with your message prepared for Bouwiser.",
+        },
+
+        email: {
+          defaultSubject: "Bouwiser website enquiry",
+          name: "Name",
+          email: "Email",
+          message: "Message",
+          notProvided: "Not provided",
+          noMessage: "No message provided",
+        },
+      },
+
+
+      loginModal: {
+        trigger: "Login",
+        close: "Close authentication window",
+
+        login: {
+          title: "Welcome back",
+          description: "Sign in to manage your renovation projects.",
+        },
+
+        signup: {
+          title: "Create your account",
+          description:
+            "Create your Bouwiser account and start your renovation journey.",
+        },
+
+        fields: {
+          fullName: "Full name",
+          fullNamePlaceholder: "Your full name",
+          email: "Email address",
+          password: "Password",
+          passwordPlaceholder: "Minimum 8 characters",
+        },
+
+        togglePassword: "Show or hide password",
+
+        actions: {
+          pleaseWait: "Please wait...",
+          login: "Login to Bouwiser",
+          createAccount: "Create account",
+        },
+
+        switch: {
+          noAccount: "No account yet?",
+          haveAccount: "Already have an account?",
+          createAccount: "Create account",
+          login: "Login",
+        },
+
+        messages: {
+          accountCreated:
+            "Account created. Please check your email and confirm your account.",
+          genericError: "Something went wrong. Please try again.",
+        },
+      },
+
+      dashboard: {
+        defaultUser: "Homeowner",
+        home: "Home",
+        unknownCity: "Unknown city",
+        toBeEstimated: "To be estimated",
+        reviewAiRecommendations: "Review AI renovation recommendations",
+
+        loading: "Loading your Bouwiser workspace...",
+        eyebrow: "Dashboard overview",
+        welcomeBack: "Welcome back, {{name}}",
+        description:
+          "Manage renovation projects, AI reports and energy improvements.",
+        newProject: "New Project",
+
+        stats: {
+          activeProjects: "Active Projects",
+          totalProjects_one: "{{count}} total project",
+          totalProjects_other: "{{count}} total projects",
+          aiReports: "AI Reports",
+          averageConfidence: "{{score}}% average confidence",
+          estimatedSavings: "Estimated Savings",
+          expectedAnnualSavings: "Expected annual savings",
+          averageAiScore: "Average AI Score",
+          acrossAllProjects: "Across all projects",
+        },
+
+        activeProjects: "Active projects",
+        renovationProgress: "Renovation progress",
+        monitorProjects:
+          "Monitor each project and continue from its current stage.",
+        viewAllProjects: "View all projects",
+        estimatedBudget: "Estimated budget",
+        projectProgress: "Project progress",
+        openProject: "Open project",
+
+        portfolioPerformance: "Portfolio performance",
+        averageProjectProgress: "Average project progress",
+        portfolioCompletion: "Portfolio completion",
+        annualSavings: "Annual savings",
+        co2Reduction: "CO₂ reduction",
+        bestPerformingProject: "Best-performing project",
+        completed: "completed",
+      },
 
       dashboardSidebar: {
         smartPlatform: "Smart renovation platform",

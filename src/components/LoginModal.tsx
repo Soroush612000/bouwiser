@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   Eye,
@@ -12,6 +13,8 @@ import {
 import { supabase } from "@/utils/supabase";
 
 export default function LoginModal() {
+  const { t } = useTranslation();
+
   const [isOpen, setIsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -56,9 +59,7 @@ export default function LoginModal() {
           return;
         }
 
-        setSuccessMessage(
-          "Account created. Please check your email and confirm your account."
-        );
+        setSuccessMessage(t("loginModal.messages.accountCreated"));
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -76,7 +77,7 @@ export default function LoginModal() {
       if (error instanceof Error) {
         setErrorMessage(error.message);
       } else {
-        setErrorMessage("Something went wrong. Please try again.");
+        setErrorMessage(t("loginModal.messages.genericError"));
       }
     } finally {
       setIsLoading(false);
@@ -96,7 +97,7 @@ export default function LoginModal() {
         onClick={() => setIsOpen(true)}
         className="rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
       >
-        Login
+        {t("loginModal.trigger")}
       </button>
 
       {isOpen && (
@@ -113,7 +114,7 @@ export default function LoginModal() {
               type="button"
               onClick={() => setIsOpen(false)}
               className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition hover:bg-slate-200"
-              aria-label="Close authentication window"
+              aria-label={t("loginModal.close")}
             >
               <X className="h-5 w-5" />
             </button>
@@ -124,13 +125,15 @@ export default function LoginModal() {
               </div>
 
               <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-950">
-                {mode === "login" ? "Welcome back" : "Create your account"}
+                {mode === "login"
+                  ? t("loginModal.login.title")
+                  : t("loginModal.signup.title")}
               </h2>
 
               <p className="mt-2 text-slate-500">
                 {mode === "login"
-                  ? "Sign in to manage your renovation projects."
-                  : "Create your Bouwiser account and start your renovation journey."}
+                  ? t("loginModal.login.description")
+                  : t("loginModal.signup.description")}
               </p>
             </div>
 
@@ -138,7 +141,7 @@ export default function LoginModal() {
               {mode === "signup" && (
                 <>
                   <label className="text-sm font-semibold text-slate-700">
-                    Full name
+                    {t("loginModal.fields.fullName")}
                   </label>
 
                   <div className="mt-2 flex items-center rounded-xl border border-slate-300 bg-white px-4 focus-within:border-orange-500 focus-within:ring-4 focus-within:ring-orange-100">
@@ -149,7 +152,7 @@ export default function LoginModal() {
                       type="text"
                       value={name}
                       onChange={(event) => setName(event.target.value)}
-                      placeholder="Your full name"
+                      placeholder={t("loginModal.fields.fullNamePlaceholder")}
                       className="h-12 w-full border-0 bg-transparent px-3 text-slate-900 outline-none"
                     />
                   </div>
@@ -161,7 +164,7 @@ export default function LoginModal() {
                   mode === "signup" ? "mt-5 block" : ""
                 }`}
               >
-                Email address
+                {t("loginModal.fields.email")}
               </label>
 
               <div className="mt-2 flex items-center rounded-xl border border-slate-300 bg-white px-4 focus-within:border-orange-500 focus-within:ring-4 focus-within:ring-orange-100">
@@ -178,7 +181,7 @@ export default function LoginModal() {
               </div>
 
               <label className="mt-5 block text-sm font-semibold text-slate-700">
-                Password
+                {t("loginModal.fields.password")}
               </label>
 
               <div className="mt-2 flex items-center rounded-xl border border-slate-300 bg-white px-4 focus-within:border-orange-500 focus-within:ring-4 focus-within:ring-orange-100">
@@ -190,7 +193,7 @@ export default function LoginModal() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Minimum 8 characters"
+                  placeholder={t("loginModal.fields.passwordPlaceholder")}
                   className="h-12 w-full border-0 bg-transparent px-3 text-slate-900 outline-none"
                 />
 
@@ -198,7 +201,7 @@ export default function LoginModal() {
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
                   className="text-slate-400 transition hover:text-slate-700"
-                  aria-label="Show or hide password"
+                  aria-label={t("loginModal.togglePassword")}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -226,23 +229,25 @@ export default function LoginModal() {
                 className="mt-7 h-12 w-full rounded-xl bg-orange-500 font-bold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isLoading
-                  ? "Please wait..."
+                  ? t("loginModal.actions.pleaseWait")
                   : mode === "login"
-                  ? "Login to Bouwiser"
-                  : "Create account"}
+                    ? t("loginModal.actions.login")
+                    : t("loginModal.actions.createAccount")}
               </button>
             </form>
 
             <p className="mt-7 text-center text-sm text-slate-500">
               {mode === "login"
-                ? "No account yet?"
-                : "Already have an account?"}{" "}
+                ? t("loginModal.switch.noAccount")
+                : t("loginModal.switch.haveAccount")}{" "}
               <button
                 type="button"
                 onClick={switchMode}
                 className="font-bold text-orange-600 hover:text-orange-700"
               >
-                {mode === "login" ? "Create account" : "Login"}
+                {mode === "login"
+                  ? t("loginModal.switch.createAccount")
+                  : t("loginModal.switch.login")}
               </button>
             </p>
           </div>
