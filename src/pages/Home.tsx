@@ -5,6 +5,7 @@ import AISection from "../components/AISection";
 import ProductComparison from "../components/ProductComparison";
 import RenovationRoadmap from "../components/RenovationRoadmap";
 import Testimonials from "../components/Testimonials";
+import FeedbackButton from "../components/FeedbackButton";
 
 export default function Home() {
   return (
@@ -24,6 +25,8 @@ export default function Home() {
 
         <Testimonials />
       </main>
+
+      <FeedbackButton />
     </>
   );
 }
