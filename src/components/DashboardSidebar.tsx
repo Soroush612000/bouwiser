@@ -47,27 +47,32 @@ const menuItems = [
     id: "my-home",
     labelKey: "dashboardSidebar.menu.myHome",
     icon: Home,
+    path: "/my-home",
   },
   {
     id: "ai-assistant",
     labelKey: "dashboardSidebar.menu.aiAssistant",
     icon: Bot,
+    path: "/ai",
     badge: "AI",
   },
   {
     id: "products",
     labelKey: "dashboardSidebar.menu.products",
     icon: ShoppingBag,
+    path: "/products",
   },
   {
     id: "contractors",
     labelKey: "dashboardSidebar.menu.contractors",
     icon: Users,
+    path: "/hub",
   },
   {
     id: "reports",
     labelKey: "dashboardSidebar.menu.reports",
     icon: FileText,
+    path: "/reports",
   },
 ];
 
@@ -280,7 +285,7 @@ export default function DashboardSidebar({
 
               <button
                 type="button"
-                onClick={() => handleNavigate("ai-assistant")}
+                onClick={() => handleNavigate("ai-assistant", "/ai")}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
               >
                 {t("dashboardSidebar.aiScore.viewReport")}

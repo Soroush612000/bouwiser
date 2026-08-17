@@ -63,6 +63,13 @@ interface UploadedPhoto {
   previewUrl?: string;
 }
 
+interface ScanRecommendation {
+  goal: GoalType;
+  score: number;
+  estimatedAnnualSaving: number;
+  productCategory: "Insulation" | "Heating" | "Solar";
+}
+
 const steps = [
   { id: 1, titleKey: "aiScan.steps.property.title", descriptionKey: "aiScan.steps.property.description", icon: Home },
   { id: 2, titleKey: "aiScan.steps.photos.title", descriptionKey: "aiScan.steps.photos.description", icon: ImagePlus },
@@ -269,6 +276,84 @@ export default function AIScan() {
       co2Reduction,
     };
   };
+
+  const getRecommendationProductsUrl = (
+    recommendation: ScanRecommendation,
+  ) => {
+    if (recommendation.productCategory === "Insulation") {
+      return "/products?category=insulation";
+    }
+
+    if (recommendation.productCategory === "Solar") {
+      return "/products?category=solar-energy";
+    }
+
+    return "/products?category=heating-cooling";
+  };
+
+  const buildRecommendations = (): ScanRecommendation[] => {
+    const area = parseNumericValue(form.floorArea) ?? 100;
+    const gas = parseNumericValue(form.gasUsage) ?? 0;
+    const electricity = parseNumericValue(form.electricityUsage) ?? 0;
+    const year = parseNumericValue(form.yearBuilt) ?? 1990;
+
+    const weakEnergyLabel = ["D", "E", "F", "G"].includes(form.energyLabel);
+
+    const recommendations: ScanRecommendation[] = [
+      {
+        goal: "Improve insulation",
+        productCategory: "Insulation",
+        score:
+          20 +
+          (year < 2000 ? 35 : 0) +
+          (weakEnergyLabel ? 20 : 0) +
+          (form.goals.includes("Improve insulation") ? 45 : 0) +
+          (form.goals.includes("Improve comfort") ? 15 : 0) +
+          (form.goals.includes("Lower energy bills") ? 10 : 0),
+        estimatedAnnualSaving: Math.round(
+          Math.max(180, Math.min(420, area * 2.1)),
+        ),
+      },
+      {
+        goal: "Install a heat pump",
+        productCategory: "Heating",
+        score:
+          15 +
+          (gas > 1200 ? 30 : gas > 700 ? 18 : 0) +
+          (form.goals.includes("Install a heat pump") ? 45 : 0) +
+          (form.goals.includes("Lower energy bills") ? 12 : 0) +
+          (form.goals.includes("Improve comfort") ? 8 : 0),
+        estimatedAnnualSaving: Math.round(
+          Math.max(220, Math.min(520, gas > 0 ? gas * 0.22 : 260)),
+        ),
+      },
+      {
+        goal: "Install solar panels",
+        productCategory: "Solar",
+        score:
+          15 +
+          (electricity > 3000 ? 30 : electricity > 1800 ? 18 : 0) +
+          (form.goals.includes("Install solar panels") ? 45 : 0) +
+          (form.goals.includes("Lower energy bills") ? 12 : 0) +
+          (form.goals.includes("Increase home value") ? 8 : 0),
+        estimatedAnnualSaving: Math.round(
+          Math.max(
+            180,
+            Math.min(650, electricity > 0 ? electricity * 0.14 : 240),
+          ),
+        ),
+      },
+    ];
+
+    return recommendations
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  };
+
+  const scanRecommendations = useMemo(
+    () => buildRecommendations(),
+    [form],
+  );
 
   const analysisResult = useMemo(
     () => calculateAnalysis(),
@@ -797,6 +882,7 @@ export default function AIScan() {
           annualSaving: analysis.annualSaving,
           co2Reduction: analysis.co2Reduction,
         },
+        recommendations: scanRecommendations,
         status: "AI analysis completed",
         progress: 100,
       };
@@ -817,8 +903,57 @@ export default function AIScan() {
     };
   };
 
+  const validateCurrentStep = () => {
+    if (currentStep === 1) {
+      if (
+        !form.address.trim() ||
+        !form.city.trim() ||
+        !form.postalCode.trim() ||
+        !form.propertyType ||
+        !form.yearBuilt.trim() ||
+        !form.floorArea.trim()
+      ) {
+        window.alert(
+          "Please complete all required property information before continuing.",
+        );
+        return false;
+      }
+
+      const year = parseNumericValue(form.yearBuilt);
+      const area = parseNumericValue(form.floorArea);
+
+      if (!year || year < 1800 || year > new Date().getFullYear()) {
+        window.alert("Please enter a valid construction year.");
+        return false;
+      }
+
+      if (!area || area <= 0 || area > 2000) {
+        window.alert("Please enter a valid floor area.");
+        return false;
+      }
+    }
+
+    if (currentStep === 3) {
+      if (!form.energyLabel) {
+        window.alert("Please select the current energy label.");
+        return false;
+      }
+    }
+
+    if (currentStep === 4) {
+      if (form.goals.length === 0) {
+        window.alert("Please select at least one renovation goal.");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const goNext = async () => {
     if (currentStep >= 5 || saveState === "saving") return;
+
+    if (!validateCurrentStep()) return;
 
     const nextStep = currentStep + 1;
     await persistScan({
@@ -1548,6 +1683,83 @@ export default function AIScan() {
                           value={`${analysisResult.co2Reduction}%`}
                           icon={Leaf}
                         />
+                      </div>
+
+                      <div className="mt-10 text-left">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+                            <Sparkles className="h-5 w-5" />
+                          </div>
+
+                          <div>
+                            <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-500">
+                              {t("aiScan.analysisItems.recommendations")}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                          {scanRecommendations.map((recommendation, index) => {
+                            const goal = renovationGoals.find(
+                              (item) => item.label === recommendation.goal,
+                            );
+                            const Icon = goal?.icon ?? Sparkles;
+
+                            return (
+                              <article
+                                key={recommendation.goal}
+                                className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm"
+                              >
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-white">
+                                    <Icon className="h-5 w-5" />
+                                  </div>
+
+                                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-50 text-sm font-black text-orange-600">
+                                    {index + 1}
+                                  </span>
+                                </div>
+
+                                <h3 className="mt-5 text-lg font-black text-slate-950">
+                                  {goal ? t(goal.titleKey) : recommendation.goal}
+                                </h3>
+
+                                {goal && (
+                                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                                    {t(goal.descriptionKey)}
+                                  </p>
+                                )}
+
+                                <div className="mt-5 rounded-2xl bg-emerald-50 p-4">
+                                  <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                                    {t("aiScan.results.annualSaving")}
+                                  </p>
+                                  <p className="mt-1 text-xl font-black text-emerald-950">
+                                    {new Intl.NumberFormat(
+                                      i18n.language?.startsWith("en")
+                                        ? "en-NL"
+                                        : "nl-NL",
+                                      {
+                                        style: "currency",
+                                        currency: "EUR",
+                                        maximumFractionDigits: 0,
+                                      },
+                                    ).format(recommendation.estimatedAnnualSaving)}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(getRecommendationProductsUrl(recommendation))}
+                                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-black text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
+                                >
+                                  {t("nav.marketplace")}
+                                  <ArrowRight className="h-4 w-4" />
+                                </button>
+                              </article>
+                            );
+                          })}
+                        </div>
                       </div>
 
                       <button

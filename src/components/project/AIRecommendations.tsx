@@ -6,6 +6,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import type {
   ProjectData,
@@ -48,6 +49,7 @@ export default function AIRecommendations({
   project,
 }: AIRecommendationsProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const translateKnownValue = (value: string) => {
     const knownValues: Record<string, string> = {
@@ -60,7 +62,7 @@ export default function AIRecommendations({
       Windows: t("aiRecommendations.categories.windows"),
       Heating: t("aiRecommendations.categories.heating"),
       Solar: t("aiRecommendations.categories.solar"),
-      "Renewable energy": t("aiRecommendations.categories.renewableEnergy"),
+      "Renewable energy": "Solar",
 
       Completed: t("aiRecommendations.status.completed"),
       Planned: t("aiRecommendations.status.planned"),
@@ -72,6 +74,43 @@ export default function AIRecommendations({
     };
 
     return knownValues[value] ?? value;
+  };
+
+  const getProductsUrl = (recommendation: ProjectRecommendation) => {
+    const title = recommendation.title.toLowerCase();
+    const category = recommendation.category.toLowerCase();
+
+    if (
+      title.includes("insulation") ||
+      category.includes("insulation")
+    ) {
+      return "/products?category=insulation";
+    }
+
+    if (
+      title.includes("heat pump") ||
+      category.includes("heating")
+    ) {
+      return "/products?category=heating-cooling";
+    }
+
+    if (
+      title.includes("solar") ||
+      category.includes("solar") ||
+      category.includes("renewable")
+    ) {
+      return "/products?category=solar-energy";
+    }
+
+    if (
+      title.includes("glazing") ||
+      title.includes("window") ||
+      category.includes("window")
+    ) {
+      return "/products?category=windows-doors";
+    }
+
+    return "/products";
   };
 
   return (
@@ -97,6 +136,7 @@ export default function AIRecommendations({
 
         <button
           type="button"
+          onClick={() => navigate("/reports")}
           className="flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-bold text-orange-700 transition hover:bg-orange-100"
         >
           {t("aiRecommendations.viewFullReport")}
@@ -202,6 +242,7 @@ export default function AIRecommendations({
 
             <button
               type="button"
+              onClick={() => navigate(getProductsUrl(recommendation))}
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-500"
             >
               {t("aiRecommendations.viewProducts")}
