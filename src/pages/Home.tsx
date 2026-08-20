@@ -5,7 +5,7 @@ import AISection from "../components/AISection";
 import ProductComparison from "../components/ProductComparison";
 import RenovationRoadmap from "../components/RenovationRoadmap";
 import Testimonials from "../components/Testimonials";
-import FeedbackButton from "../components/FeedbackButton";
+import CommunityFeedbackBar from "../components/CommunityFeedbackBar";
 
 export default function Home() {
   return (
@@ -14,19 +14,14 @@ export default function Home() {
 
       <main>
         <Hero />
-
         <TrustedBy />
-
         <AISection />
-
         <ProductComparison />
-
         <RenovationRoadmap />
-
         <Testimonials />
       </main>
 
-      <FeedbackButton />
+      <CommunityFeedbackBar />
     </>
   );
 }
