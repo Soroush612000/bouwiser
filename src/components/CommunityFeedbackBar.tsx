@@ -2,7 +2,7 @@ import { MessageSquareText, Users, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const COMMUNITY_COUNT = 114;
+const COMMUNITY_COUNT = 122;
 
 const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSenXiF_5VexVYraJivpjlLmjUbpFUClON9-dE1yeIKFYZF7cw/viewform?embedded=true";

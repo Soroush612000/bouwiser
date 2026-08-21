@@ -1,7 +1,7 @@
 import { Users, X } from "lucide-react";
 import { useState } from "react";
 
-const COMMUNITY_COUNT = 114;
+const COMMUNITY_COUNT = 122;
 
 export default function CommunityCounter() {
   const [open, setOpen] = useState(false);
